@@ -21,8 +21,8 @@
   "geometryService": "http://utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer",
   "links": [
     {
-      "label": "Esri",
-      "url": "http://www.esri.com"
+      "label": "RPSASA",
+      "url": "http://www.asascience.com"
     }
   ],
   "widgetOnScreen": {
@@ -240,13 +240,31 @@
         "index": 12
       },
       {
-        "name": "ERG",
-        "label": "ERG",
+        "name": "Stressors",
+        "label": "Stressors",
         "version": "1.2",
-        "uri": "widgets/ERG/Widget",
-        "config": "configs/ERG/config_ERG.json",
+        "uri": "widgets/Stressors/Widget",
+        "config": "configs/Stressors/config_Stressors.json",
+        "index": 15,
+        "id": "widgets_Stressors_Widget_35"
+      },
+      {
+        "name": "SiteScreening",
+        "label": "Site Screening",
+        "version": "1.2",
+        "uri": "widgets/SiteScreening/Widget",
+        "config": "configs/SiteScreening/config_SiteScreening.json",
+        "index": 13,
+        "id": "widgets_SiteScreening_Widget_33"
+      },
+      {
+        "name": "SiteComparison",
+        "label": "Site Comparison",
+        "version": "1.2",
+        "uri": "widgets/SiteComparison/Widget",
+        "config": "configs/SiteComparison/config_SiteComparison.json",
         "index": 14,
-        "id": "widgets_ERG_Widget_33"
+        "id": "widgets_SiteComparison_Widget_34"
       }
     ],
     "groups": []
