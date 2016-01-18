@@ -1,0 +1,125 @@
+EAD_dbConnection:
+  Platform: SQL_SERVER
+  Instance: AGSDEV01
+  Authentication: DATABASE_AUTH
+  Username: sde
+  Password: Password123
+  Database Name: EAD_CoastalAtlas
+EAD_FileGeodatabase: E:\Data\EAD\CoastalAtlas.gdb
+EAD_FileGeodatabase_TEST: W:\CONTRACTS\2015\15-241 EAD\CoastalAtlas\CoastalAtlas_v2.gdb
+OutputURL: https://gis.asascience.com/arcgis/rest/directories/arcgisjobs/eadcoastalatlas/incidentimpactstool_gpserver
+EAD_dbStructure:
+  AdministrativeBoundary:
+    Abu Dhabi Boundary: {FC_Name: ADBoundary,GeoType: Polygon}
+    Abu Dhabi Territorial Waters: {FC_Name: ADTerritorialWaters,GeoType: Polygon}
+    Emirates: {FC_Name: Emirates,GeoType: Polygon}
+    Island Ownership: {FC_Name: IslandOwnership,GeoType: Polygon}
+    Protected Areas: {FC_Name: ProtectedArea,GeoType: Polygon}
+    Study Area: {FC_Name: study_area,GeoType: Polygon}
+    Zone Boundaries: {FC_Name: zone_boundary,GeoType: Polygon}  
+  AlgalBloom:
+    Algal Bloom Sites: {FC_Name: AlgalBloomSite,GeoType: Point}
+  CulturalHeritage:
+    Archaeological Sites: {FC_Name: ArchaeologicalArea,GeoType: Polygon}  
+  Habitat:
+    Habitat Areas: {FC_Name: Habitat,GeoType: Polygon}
+  Fauna:
+    Birds: {FC_Name: Birds,GeoType: Point}
+    Dolphins: {FC_Name: Dolphins,GeoType: Point}
+    Dugongs: {FC_Name: Dugongs,GeoType: Point}
+    Dugong Density: {FC_Name: DugongDensity,GeoType: Point}
+    Turtle Nests: {FC_Name: TurtleNests,GeoType: Point}
+    Turtles: {FC_Name: Turtles,GeoType: Point}
+    Mammals: {FC_Name: Mammals,GeoType: Point}
+    Reptiles: {FC_Name: Reptiles,GeoType: Point}    
+  Fisheries:
+    Aqua Culture Sites: {FC_Name: AquaCultureFarms,GeoType: Point}
+    Buhoor Areas: {FC_Name: BuhoorArea,GeoType: Polygon}
+    Fishing Ground Grid: {FC_Name: FishingGroundGrid,GeoType: Polygon}
+    Landing Sites: {FC_Name: LandingSite,GeoType: Point}
+    Pearl Diving Sites: {FC_Name: PearlDiving,GeoType: Polygon}
+  Infrastructure:
+    Power Stations: {FC_Name: PowerStations,GeoType: Point}
+    Communication Towers: {FC_Name: CommunicationTowers,GeoType: Point}
+    Road Network: {FC_Name: RoadSegment,GeoType: Polyline}
+    Industrial Facilities: {FC_Name: IndustrialFacility,GeoType: Polygon}
+    Desalination Plants: {FC_Name: DesalPlant,GeoType: Polygon}
+    Oil Fields: {FC_Name: OilField,GeoType: Polygon}
+  Hydrography:
+    Bathymetry: {FC_Name: ADBathymetry,GeoType: Polyline}
+    Shoreline: {FC_Name: ADShoreline,GeoType: Polyline}
+    Dredged Areas: {FC_Name: DredgingChannel,GeoType: Polygon}
+    Outfall Locations: {FC_Name: OceanOutfall,GeoType: Point}
+  HabitatSensitivity:
+  HabitatValue:
+  HabitatVulnerability:
+SensitivityFields:
+  Petroleum - Floating, Non-Persistant: OIL_NONPERS_SENS
+  Petroleum - Floating, Persistant: OIL_PERS_SENS
+  Petroleum - Non-Floating: OIL_NONFLOAT_SENS
+  Chemical - Floating: CHEM_FLOAT_SENS
+  Chemical - Non-Floating: CHEM_NONFLOAT_SENS
+  Chemical - Dissolved: CHEM_DISS_SENS
+  Habitat Loss: HAB_LOSS_SENS
+  Thermal Change: THERMAL_SENS
+  Sedimentation: SEDIMENT_SENS
+  Terrigenous Pollution: TERRIGENOUS_SENS
+  Invasive Species: INVASIVE_SENS
+  Eutrophication: EUTROPHICATION_SENS
+  Over Exploitation of Resources: OVEREXPLOITATION_SENS
+  Sea Level Rise: SLR_SENS
+Habitats:
+  Mudflats: 1010-Mudflats and sand exposed at low tide
+  Tidal flats: 1020-Sheltered tidal flats with cyanobacterial mats
+  Saltmarsh: 1030-Saltmarsh
+  Mangroves: 1040-Mangroves
+  Storm beach ridges: 1050-Storm beach ridges
+  Sandy beaches: 1060-Sandy beaches
+  Rock and Gravelly Beaches: 1070-Beach rock and gravelly beaches
+  Fringing Reef: 11100-Fringing Reef
+  Fringing reef with macroalgae: 11110-Fringing reef with macroalgae
+  Patch Reef: 11200-Patch Reef
+  Patch reef with macroalgae: 11210-Patch reef with macroalgae
+  Seagrass bed: 12000-Seagrass bed
+  Hard-bottom: 13000-Hard-bottom
+  Hard-bottom with macroalgae: 13010-Hard-bottom with macroalgae
+  Unconsolidated bottom: 14000-Unconsolidated bottom
+  Artifical reef: 15100-Rock armouring-artifical reef
+  Marine structure: 15200-Marine structure
+  Dredged seabed: 16100-Dredged seabed
+  Dredged area wall: 16200-Dredged area wall
+  Deep sub-tidal seabed: 17000-Deep sub-tidal seabed
+  Coastal plains on well-drained sandy ground: 2011-Coastal plains on well-drained sandy ground
+  Coastal plains on well-drained rocky or gravelly terrain: 2012-Coastal plains on well-drained rocky or gravelly terrain
+  Coastal sand sheets and low dunes: 2020-Coastal sand sheets and low dunes
+  Coastal cliffs: 2030-Coastal cliffs, headlands, rocky slopes and wadis in coastal situations
+  Coastal sabkha: 3100-Coastal sabkha, including sabkha matti
+  Sand sheets and dunes with tree cover: 4110-Sand sheets and dunes with tree cover
+  Sand sheets and dunes with shrub cover: 4120-Sand sheets and dunes with shrub cover
+  Sand sheets and dunes with dwarf shrub cover: 4130-Sand sheets and dunes with dwarf shrub cover
+  Sand sheets and dunes with perennial herbs and graminoids: 4140-Sand sheets and dunes with perennial herbs and graminoids
+  Oil industry: 9210-Oil industry
+  Airports and aerodromes: 9220-Airports and aerodromes
+  Port areas: 9230-Port areas
+  Pipelines infrastructure: 9500-Pipelines infrastructure
+ObservationLayers:
+  Birds: [Count, Species]
+  Dolphins: [Count, Species]
+  Dugongs: [Count, Species]
+  Dugong Density: [Count]
+  Turtles: [Count, Species]
+  Mammals: [Count, Species]
+  Reptiles: [Count, Species]
+Predefined Site Screening Queries:
+  Test1:
+    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: null}
+    Q2: {FC: Shoreline,Type: Distance,Operator: '>=',Value: 10000,Field: null,FieldValue: null,OverlapCellSize: null,Weight: null}
+    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count_,FieldValue: 333,OverlapCellSize: null,Weight: null}
+    Q4: {FC: Oil Fields,Type: Overlap,Operator: '>',Value: 0,Field: NAME,FieldValue: null,OverlapCellSize: 5,Weight: null}
+  Test2:
+    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: 2}
+    Q2: {FC: Shoreline,Type: Distance,Operator: '>=',Value: 10000,Field: null,FieldValue: null,OverlapCellSize: null,Weight: 1}
+    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count_,FieldValue: 333,OverlapCellSize: null,Weight: 2}
+    Q4: {FC: Oil Fields,Type: Overlap,Operator: '>',Value: 0,Field: NAME,FieldValue: null,OverlapCellSize: 5,Weight: 100}
+  Test3:
+    Q1: {FC: Dugongs,Type: Count,Operator: 'Range',Value: 10-50,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: null}

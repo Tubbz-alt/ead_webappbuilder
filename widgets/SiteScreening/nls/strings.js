@@ -1,18 +1,11 @@
 define({
     root: {
-        calculateBy: "Calculate by",
-        material: "Material",
-        spillSize: "Spill Size",
-        timeOfSpill: "Time of Spill",
-        spillLocation: "Draw a Spill Location",
-        labelSolve: "Solve",
+        spillLocation: "Draw a Site Location",
+        labelSolve: "Run",
         labelClear: "Clear",
-        windDirection: "Wind Direction (blowing to)",
-        windDirectionLabel: "Lookup wind info",
-        tabERG: "ERG",
-        tabFacilities: "Facilities",
-        tabDemo: "Demographics",
-        noresult: "No query results to display chart."
+        tabERG: "Parameters",
+        tabFacilities: "Construct Query",
+        tabDemo: "Upload File",
+        noresult: "Upload File to run Incident Impact."
     }
-    // "zh-cn": true
 });

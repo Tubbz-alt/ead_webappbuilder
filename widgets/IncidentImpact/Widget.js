@@ -13,6 +13,7 @@ define([
     "esri/graphic",
     "esri/geometry/Point",
     "esri/symbols/SimpleMarkerSymbol",
+    "dojo/dom-attr",
     "esri/geometry/Polyline",
     "esri/symbols/SimpleLineSymbol",
     "esri/geometry/Polygon",
@@ -31,7 +32,7 @@ define([
     "dojo/dom",
     "dojo/dom-style",
     "dijit/form/Select",
-    //"dojox/form/CheckedMultiSelect",
+    "dojox/form/CheckedMultiSelect",
     "dijit/form/TextBox",
     "esri/geometry/jsonUtils",
     "dojo/_base/array",
@@ -42,7 +43,7 @@ define([
     "dojo/dom-construct",
     "./FacilitiesPane"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct, FacilitiesPane) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, domAttr, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct, FacilitiesPane) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // DemoWidget code goes here
 
@@ -50,63 +51,67 @@ define([
             //templateString: template,
 
             baseClass: 'jimu-widget-erg',
-            name: 'SCREENING',
+            name: 'INCIDENT',
             spillGraphicsLayer: null,
-            ergGraphicsLayer: null,
-            selectedMaterialType: null,
+            selectedHabitat: null,
+            selectedStressor: null,
+            selectedObsType: null,
             selectedCustomMetrics:null,
-            ergGPChemicalService: null,
             ergGPJobID: null,
+            incidentGraphic: null,
+            ergGPActive: null,
+            executionType: null,
             maploading:null,
-            scenarioName:null,
-            queryname:null,
-            querylistMaster:[],
-            incidentGraphic,
 
+            onChangeStressors: function (newValue) {
+                var stringvalue = '';
+                for (var i = 0; i < newValue.length; i++) {
+                    if(i>0){
+                       stringvalue+=';';
+                    }
+                    stringvalue+=newValue[i];
+                }
+                this.selectedStressor = stringvalue;
+            },
 
-            onChangelayer: function (newValue) {
-                this.selectedSpillSize = newValue;
+            onChangeHabitats: function (newValue) {
+                var stringvalue = '';
+                for (var i = 0; i < newValue.length; i++) {
+                    if(i>0){
+                       stringvalue+=';';
+                    }
+                    stringvalue+=newValue[i];
+                }
+                this.selectedHabitat = stringvalue;
+            },
+
+            onChangeobservations: function (newValue) {
+                var stringvalue = '';
+                for (var i = 0; i < newValue.length; i++) {
+                    if(i>0){
+                       stringvalue+=';';
+                    }
+                    stringvalue+=newValue[i].replace(' - ',',');
+                }
+                this.selectedObsType = stringvalue;
             },
             
             onChangeCustomMetrics: function (newValue) {
                 this.selectedCustomMetrics = newValue;
-                document.getElementById("predefinedQ").innerHTML = newValue;
+                document.getElementById("customvalue").innerHTML = newValue;
             },
             
             onClearBtnClicked: function () {
                 this.spillGraphicsLayer.clear();
             },
-            onSizeDirChange:function(value){
-                this.sizevalue = value;
-            },
 
-            onChangequeryType:function(value){
-                //querylistMaster
-            },
-
-            onChangequeryOperator:function(value){
-                //querylistMaster
-            },
-
-            scenarioNameChange:function(value){
-                this.scenarioName = value
-            },
-
-            queryNameChange:function(value){
-                this.queryname = value;
-            },
-
-            ERGRequestFailed: function (error) {
-
-            },
-
-            
             //asynchronous job completed successfully
             displayERGServiceResults: function (results) {
-                 
-                //add raster to map
 
-                domStyle.set("loadingrunscreen", {
+                if (results.paramName === "Output") {
+                    window.open(results.value,"_blank");
+                }
+                domStyle.set("loadingrun", {
                     "display": 'none',
                 });
                 //domAttr.removeAttr("runbut", "disabled");
@@ -161,7 +166,7 @@ define([
                 this.drawToolbar.deactivate();
                 this.map.enableMapNavigation();
                 this.incidentGraphic = evt.geometry;
-                
+
                 // figure out which symbol to use
                 var symbol;
                 if (evt.geometry.type === "polygon") {
@@ -183,28 +188,56 @@ define([
                 this.drawToolbar.activate(tool);
             },
 
-            addQuery:function(){
-
-            },
-
             onSolve: function (evt) {
-
+                var params = {};
+                params['InputType'] = 'AOI';
+                params['Input'] = this.incidentGraphic;
                 if(this.incidentGraphic == null){
                     alert("Please add polygon geometry input or upload a file.");
                 }
                 //params['InputType'] = 'Shapefile';
                 //params['InputType'] = 'Model Output';
                 else{
-                    //domAttr.addAttr("runbut", "disabled");
-                    domStyle.set("loadingrunscreen", {
-                        "display": 'inherit',
-                      });
-                    this.maploading = new LoadingIndicator();
-                    var t = document.getElementById("loadingrunscreen");
-                    this.maploading.placeAt(t);
+
+                    if(this.selectedCustomMetrics == null || this.selectedCustomMetrics == 'none'){
+                        if(this.selectedStressor == null){
+                            alert("Please Select a Stressor");
+                        }
+                        else if(this.selectedHabitat == null){
+                            alert("Please Select a Habitat");   
+                        }
+                        else if(this.selectedObsType == null){
+                             alert("Please Select a Observation");   
+                        }
+                        else {
+                            //domAttr.addAttr("runbut", "disabled");
+                            domStyle.set("loadingrun", {
+                                "display": 'inherit',
+                              });
+                            this.maploading = new LoadingIndicator();
+                            var t = document.getElementById("loadingrun");
+                            this.maploading.placeAt(t);
+
+                            params['Observations'] = this.selectedObsType;
+                            params['Habitats'] = this.selectedHabitat;
+                            params['Stressors'] = this.selectedStressor;
+                            this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
+                                        lang.hitch(this, this.onERGGPStatusCallback));
+                        }           
+                    }
+                    else{
+                        domStyle.set("loadingrun", {
+                                "display": 'inherit',
+                              });
+                        this.maploading = new LoadingIndicator();
+                        var t = document.getElementById("loadingrun");
+                        this.maploading.placeAt(t);
+
+                        params['CustomMetrics'] =this.selectedCustomMetrics;
+                        this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
+                                        lang.hitch(this, this.onERGGPStatusCallback));
+                    }
                 }
-                
-                               
             },
 
             postCreate: function () {
@@ -238,14 +271,13 @@ define([
                             content: this.tabNode1
                         },
                         {
-                            title: this.nls.tabFacilities,
-                            content: this.tabNode3
-                        },
-                        {
                             title: this.nls.tabDemo,
                             content: this.tabNode2
                         }
-                        
+                        /*{
+                            title: this.nls.tabFacilities,
+                            content: this.tabNode3
+                        }*/
                     ],
                     selected: this.nls.conditions
                 }, this.tabERG);
@@ -256,39 +288,34 @@ define([
                 this.ergGPChemicalService = new Geoprocessor(this.config.url);
 
                 //stressors
-                var layerOption = [];
-                for (var i = 0; i < this.config.layers.length; i++) {
-                    layerOption[i] ={};
-                    layerOption[i].label =this.config.layers[i];
-                    layerOption[i].value =this.config.layers[i];
+                var stressorOption = [];
+                for (var i = 0; i < this.config.stressors.length; i++) {
+                    stressorOption[i] ={};
+                    stressorOption[i].label =this.config.stressors[i];
+                    stressorOption[i].value =this.config.stressors[i];
                 }
 
-                this.queryLayer.addOption(layerOption);
-                this.own(on(this.queryLayer, "change", lang.hitch(this, this.onChangelayer)));
+                this.Stressors.addOption(stressorOption);
+                this.own(on(this.Stressors, "change", lang.hitch(this, this.onChangeStressors)));
 
-                var queryType = [];
-                for (var i = 0; i < this.config.queryType.length; i++) {
-                     queryType[i] ={};
-                     queryType[i].label =this.config.queryType[i];
-                     queryType[i].value =this.config.queryType[i];
+                var obsOption = [];
+                for (var i = 0; i < this.config.observations.length; i++) {
+                    obsOption[i] ={};
+                    obsOption[i].label =this.config.observations[i];
+                    obsOption[i].value =this.config.observations[i];
                 }
 
-                this.queryType.addOption(queryType);
-                this.own(on(this.queryType, "change", lang.hitch(this, this.onChangequeryType)));
+                this.obs.addOption(obsOption);
+                this.own(on(this.obs, "change", lang.hitch(this, this.onChangeobservations)));
 
-                var queryOperator = [];
-                for (var i = 0; i < this.config.queryOperator.length; i++) {
-                     queryOperator[i] ={};
-                     queryOperator[i].label =this.config.queryOperator[i];
-                     queryOperator[i].value =this.config.queryOperator[i];
+                var habitatsOption = [];
+                for (var i = 0; i < this.config.habitats.length; i++) {
+                    habitatsOption[i] ={};
+                    habitatsOption[i].label =this.config.habitats[i];
+                    habitatsOption[i].value =this.config.habitats[i];
                 }
-
-
-                this.queryOperator.addOption(queryOperator);
-                this.own(on(this.queryOperator, "change", lang.hitch(this, this.onChangequeryOperator)));
-
-                this.own(on(this.scenarioName, "change", lang.hitch(this, this.scenarioNameChange)));
-                this.own(on(this.queryName, "change", lang.hitch(this, this.queryNameChange)));
+                this.Habitats.addOption(habitatsOption);
+                this.own(on(this.Habitats, "change", lang.hitch(this, this.onChangeHabitats)));
 
                 var CustomMetricsChoices = [];
                 for (var i = 0; i < this.config.custom.length; i++) {
@@ -313,7 +340,7 @@ define([
                 this.ergGraphicsLayer = new GraphicsLayer();
                 this.map.addLayer(this.ergGraphicsLayer);
 
-
+                
                 this.drawToolbar = new Draw(this.map);
                 this.own(on(this.drawToolbar, "draw-end", lang.hitch(this, this.addGraphic)));
                 this.own(on(this.drawSpillInfo, "click", lang.hitch(this, this.bindDrawToolbar)));
@@ -335,7 +362,6 @@ define([
             },
 
             onSignOut: function () {
-
             },
 
             destroy: function () {
@@ -462,6 +488,7 @@ define([
             _clear: function () {
                 this._clearCharts();
             },
+
 
             _setHightLightSymbol:function(g){
                 switch(g.geometry.type){

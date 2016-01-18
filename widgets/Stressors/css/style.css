@@ -6,6 +6,10 @@
     width: 30px;
 }
 
+.jimu-widget-frame.jimu-container{
+    overflow-x:hidden !important;
+}
+
 .jimu-widget-stressors .play-section {
     overflow: hidden;
     margin-top: 20px;

@@ -1,0 +1,80 @@
+<div style="height:100%;">
+    <div class="item" style="width:100%;height:100%;">
+        <div class="content" style="height:100%;">
+            <div data-dojo-attach-point="tabERG">
+                <div data-dojo-attach-point="tabNode1" class="ergTabs">
+                    <label>${nls.spillLocation}</label>
+                    <div data-dojo-attach-point="drawSpillInfo">
+                        <div id="Polygon" title="${nls.spillLocation}" class="searchFeaturesIcon searchPoint"></div>
+                    </div>
+
+                    <div>
+                        <label>${nls.Stressors}</label> <br><br>
+                        <select class="impControls" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-attach-point="Stressors" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
+                    </div>
+                    <br>
+                    <br>
+                    <div>
+                        <label>${nls.obs}</label> <br><br>
+                        <select class="impControls"  data-dojo-attach-point="obs" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
+                    </div>
+                    <br>
+                    <br>
+                    <div>
+                        <label>${nls.Habitats}</label> <br><br>
+                        <select class="impControls" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-attach-point="Habitats" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
+                    </div>
+                    <br>
+                    <div>
+                        <label>${nls.CustomMetrics}</label> <br><br>
+                        <select class="impControls"  data-dojo-attach-point="CustomMetrics"
+                                data-dojo-type="dijit/form/Select"></select>
+
+                        <br>
+                        <label id="customvalue"></label>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="jimu-r-row play-section">
+                        <div class="col-1-2">
+                            <div id='runbut' class="jimu-btn btn-solve" data-dojo-attach-point="btnSearch"
+                                 data-dojo-attach-event="onclick:onSolve">${nls.labelSolve}</div>
+                        </div>
+                        <div class="col-1-2">
+                            <div class="jimu-btn btn-clear" data-dojo-attach-point="btnClear" data-dojo-attach-event="onclick:onClearBtnClicked">${nls.labelClear}</div>
+                        </div>
+                    </div>
+                    <div id='loadingrun' style='display:none;padding-top: 10px;'>
+                        File be downloaded when finished running.
+                    </div>
+                </div>
+
+                <div data-dojo-attach-point="tabNode2" class="ergTabs">
+                    <div data-dojo-attach-point="progressBar" data-dojo-type="dijit/ProgressBar" data-dojo-props='indeterminate:true' style="display:none;"></div>
+                    <div class="results-section" data-dojo-attach-point="resultsSection" style="display:none;">
+                        <div class="results-header">
+                            <div class="chart-title" data-dojo-attach-point="chartTitle"></div>
+                            <div class="paging-section">
+                                <ul data-dojo-attach-point="pagingUl"></ul>
+                            </div>
+                        </div>
+                        <div data-dojo-attach-point="description" style="margin-top:20px;"></div>
+                        <div data-dojo-attach-point="totalSum" style="font-weight:bold;text-align:center"></div>
+                    </div>
+                    <div class="noresults-section" data-dojo-attach-point="noresultsSection">
+                        ${nls.noresult}
+                    </div>
+                    <br>
+                    <div class="noresults-section" data-dojo-attach-point="noresultsSection">
+                        Shapefile must be in compressed zip file format and in WGS84 Projection
+                    </div>
+                    <br>
+                    <br>
+                    <form id="form" action="url">
+                        <input type="file" id="btn-upload" class="uploadBtn" name="pic" accept=".zip">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

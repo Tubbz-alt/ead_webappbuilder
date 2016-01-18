@@ -1,11 +1,57 @@
 .jimu-widget-erg{
     margin: -14px -14px 10px -14px;
 }
+#widgets_IncidentImpact_Widget_34_panel{
+    height: 550px !important;
+    width: 450px !important;
+}
+
+.uploadBtn{
+    border:1px solid #333333;
+    background:url(../images/top.png) 30px 5px;
+    cursor: pointer;
+    font-size:15px;
+    padding: 5px;
+    width:400px;
+    height:30px;
+    background-repeat: no-repeat;
+    vertical-align:middle; /* emulates a <button> if node is not */
+    text-align:center;
+}
+.dijitReset .dijitButtonContents{
+    background-color: grey !important;
+}
+.dijitReset .dijitMenuItemLabel{
+    background-color: grey !important;
+}
+.dijitReset .dijitMenuItemIconCell{
+    background-color: grey !important;
+}
+.uploadHover{
+    background-image:url('../images/top.png');
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.dojoxCheckedMultiSelectMenu{
+    max-height: 200px;
+}
+.uploadPress{
+    background-image:url('../images/top.png');
+}
+.uploadDisabled{
+    background-image:none;
+    background-color:#666;
+    color:#999;
+    border:1px solid #999;
+}
 
 .jimu-widget-erg .dijitArrowButtonContainer{
     width: 30px;
 }
-
+.jimu-widget-frame.jimu-container{
+    overflow-x:hidden !important;
+}
 .jimu-widget-erg .play-section {
     overflow: hidden;
     margin-top: 20px;
@@ -24,7 +70,8 @@
 }
 
 .jimu-widget-erg .searchPoint{
-    background-image: url("../images/point.png");
+    background-image: url("../images/polygon.png");
+    cursor:pointer;
 }
 
 .jimu-widget-erg .ergControls{
