@@ -1,6 +1,6 @@
 define({
     root: {
-        Stressors: "Stressors (Sensitivity)",
+        Stressors: "Stressors (Sensitivity/Vulnerabilities)",
         obs: "Observations",
         Habitats: "Habitats",
         CustomMetrics: "Custom Metrics Setting",

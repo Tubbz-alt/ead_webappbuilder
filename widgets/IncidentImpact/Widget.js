@@ -168,7 +168,9 @@ define([
             },
             
             onClearBtnClicked: function () {
-                this.spillGraphicsLayer.clear();
+                if(this.spillGraphicsLayer != null){
+                    this.spillGraphicsLayer.clear();
+                }
                 var newStore = new dojo.data.ItemFileReadStore({data: {  identifier: "",  items: []}});   
                 dijit.byId("grid").setStore(newStore, {}); 
 
@@ -205,9 +207,16 @@ define([
             displayERGServiceResults: function (results) {
 
                 if (results.paramName === "Output") {
+                    var urlcsv;
+                    if(this.config.proxy != ''){
+                        urlcsv = this.config.proxy+ results.value;
+                    }
+                    else{
+                        urlcsv = results.value;
+                    }
                     window.open(results.value,"_blank");
 
-                    var recordsStoreForGrid= new dojox.data.CsvStore({url: results.value});
+                    var recordsStoreForGrid= new dojox.data.CsvStore({url: urlcsv});
 
                     var layoutheaders = [
                         [
@@ -516,24 +525,35 @@ define([
                 this.metricType.addOption(queryTypeChoices);
 
                 document.getElementById("infile-impact").onchange = function() {
+                    
+                    if(this.spillGraphicsLayer != null){
+                        this.incidentGraphic == null;
+                        this.spillGraphicsLayer.clear();
+                    }
+
                     var gpUploadURL = that.config.url_upload;
-                
+                    
+                    urlUtils.addProxyRule({
+                        urlPrefix : that.config.proxyprefix,
+                        proxyUrl : that.config.proxy
+                    });
+                    var form = dojo.byId("uploadFormImpact");
                     var requestHandle = esri.request({  
                         url: gpUploadURL,  
-                        form: dojo.byId("uploadFormImpact"),  
+                        form: form,  
                         content : {  
-                          f : "json"  
+                          f : "pjson"  
                          } , 
+                        handleAs: "json",
                         load: uploadSucceeded,  
                         error: uploadFailed
                     });  
                       
                     function uploadFailed(response) {                                                                                                                                                                                                                                                             
-                      alert('Upload Failed, Please try again');
+                      alert(response.message);
                     }  
-                    function uploadSucceeded(response) {                                                                                                                                                                                                                                                             
+                    function uploadSucceeded(response,io) {                                                                                                                                                                                                                                                             
                       this.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
-                      this.inputFileDataType = "";
                     }  
                 };
 

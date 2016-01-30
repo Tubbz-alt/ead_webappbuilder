@@ -1,4 +1,6 @@
 {
+  "proxy":"",
+  "proxyprefix":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services",
   "token":"",
   "url":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services/EAD_CoastalAtlas_Drafts/SiteScreening2/GPServer/Site%20Screening%20v2",
   "url_upload":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services/EAD_CoastalAtlas_Drafts/SiteScreening2/GPServer/uploads/upload",

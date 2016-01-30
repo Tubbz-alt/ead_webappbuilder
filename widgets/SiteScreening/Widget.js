@@ -500,24 +500,38 @@ define([
                 this.own(on(this.CustomMetricsSite, "change", lang.hitch(this, this.onChangeCustomMetrics)));
 
                 document.getElementById("infile-site").onchange = function() {
+                    
+                    if(this.spillGraphicsLayer != null){
+                        this.incidentGraphic == null;
+                        this.spillGraphicsLayer.clear();
+                    }
+
+                    //esriConfig.defaults.io.proxyUrl = "proxy.aspx";  
+                    //esriConfig.defaults.io.alwaysUseProxy = true;
+                    urlUtils.addProxyRule({
+                        urlPrefix : that.config.proxyprefix,
+                        proxyUrl : that.config.proxy
+                    });
+
                     var gpUploadURL = that.config.url_upload;
-                
+                    var form = dojo.byId("uploadFormSite");
+
                     var requestHandle = esri.request({  
                         url: gpUploadURL,  
-                        form: dojo.byId("uploadFormSite"),  
+                        form: form,  
                         content : {  
-                          f : "json"  
+                          f : "pjson"  
                          } , 
+                        handleAs: "json",
                         load: uploadSucceeded,  
                         error: uploadFailed  
                     });  
                       
                     function uploadFailed(response) {                                                                                                                                                                                                                                                             
-                      alert('Upload Failed, Please try again');
+                      alert(response.message);
                     }  
-                    function uploadSucceeded(response) {                                                                                                                                                                                                                                                             
+                    function uploadSucceeded(response,io) {                                                                                                                                                                                                                                                             
                       this.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
-                      this.inputFileDataType = "";
                     }
                 };
 
@@ -673,10 +687,6 @@ define([
                 outlineSymbol.setWidth(outlineWidth);
                 var symbol = new SimpleFillSymbol(style, outlineSymbol, color);
                 return symbol;
-            },
-
-            _clear: function () {
-                this._clearCharts();
             },
 
             _setHightLightSymbol:function(g){
