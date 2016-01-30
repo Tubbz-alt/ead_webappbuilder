@@ -589,7 +589,7 @@ define([
                       alert(response.message);
                     }  
                     function uploadSucceeded(response,io) {                                                                                                                                                                                                                                                             
-                      this.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      that.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
                     }
                 };
 
