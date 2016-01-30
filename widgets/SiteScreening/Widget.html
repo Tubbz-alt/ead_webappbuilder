@@ -1,5 +1,5 @@
 <div style="height:100%;">
-    <div class="item" style="width:100%;height:100%;">
+    <div class="item" style="width:100%;height:100%;font-size:13px;">
         <div class="content" style="height:100%;">
             <div data-dojo-attach-point="tabERG">
                 <div data-dojo-attach-point="tabNode1" class="ergTabs">
@@ -16,8 +16,8 @@
                     </div><br>
                     <div>
                         <label>Predefined Queries</label> <br>
-                        <select class="ergControls"  data-dojo-attach-point="CustomMetrics"
-                                data-dojo-type="dijit/form/Select"></select>
+                        <select class="ergControls" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-attach-point="CustomMetricsSite"
+                                data-dojo-type="dojox/form/CheckedMultiSelect"></select>
                         <label id="predefinedQ"></label><br>
                     </div>
 
@@ -25,10 +25,9 @@
                     <label>Analysis Cell Size in Meters </label> <br>
                     <input data-dojo-type="dijit/form/NumberSpinner"
                            data-dojo-attach-point="winDirSpinner"
-                           value="5000"
+                           value="5000" id='winDirSpinner'
                            data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
-                           class="ergControls"
-                           data-dojo-attach-event="onChange:onSizeDirChange"/>
+                           class="ergControls"/>
                     <br>
                     <!-- BUTTONS -->
                     <div class="jimu-r-row play-section">
@@ -40,7 +39,11 @@
                             <div class="jimu-btn btn-clear" data-dojo-attach-point="btnClear" data-dojo-attach-event="onclick:onClearBtnClicked">Clear</div>
                         </div>
                         <div id='loadingrunscreen' style='display:none;padding-top: 99px;'>
-                            File be downloaded when finished running.
+                            Layer will be displayed on map when finished.
+                        </div>
+                        <div id='downloadfile' style='display:none;padding-top: 69px;'>
+                            <a id='downloadfileLinkdetails' target='_blank' href="">File Details</a>
+                            <a id='downloadfileLink' target='_blank' href="">Download Image</a>
                         </div>
                     </div>
                 </div>
@@ -56,10 +59,15 @@
                         Shapefile must be in compressed zip file format and in WGS84 Projection
                     </div>
                     <br>
-                    <br>
-                    <form id="form" action="url">
-                        <input type="file" id="btn-upload" class="uploadBtn" name="pic" accept=".zip">
+                    <form id="uploadFormSite" method="post" enctype="multipart/form-data">
+                        <input type="file" id="infile-site" class="uploadBtn" name="pic" accept=".zip">
                     </form>
+                    <br>
+                    <br>
+                    <br>
+                    <label>Shapefile Type</label> <br>
+                        <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="shpType"
+                                data-dojo-type="dijit/form/Select"></select>
                 </div>
 
                 <div data-dojo-attach-point="tabNode3" class="ergTabs">
@@ -67,36 +75,53 @@
                      <div>
                         <label>Query Name</label> <br>
                         <input id='queryName'  class="ergControls"  data-dojo-attach-point="queryName"
-                                data-dojo-type="dijit/form/TextBox"></input> <br>
+                                data-dojo-type="dijit/form/TextBox"></input>
                     </div><br>
-                    <div>
-                        <label>Query Layer Name</label> <br>
+                    <div><label>Query Layer Name</label>
                         <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryLayer"
                                 data-dojo-type="dijit/form/Select"></select>
                     </div>
-                    <br>
                     <div>
                         <div>
-                            <br><label>Query Type</label> 
-                            <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryType"
-                                    data-dojo-type="dijit/form/Select"></select>
+                            <div style='display: inline-block;width: 177px;'>
+                                <br><label>Query Type</label>
+                                <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryType" data-dojo-type="dijit/form/Select"></select>
+                            </div>
+                            <div style='display: block;width: 163px;float: right;'>
+                                <br><label>Operator</label>
+                                <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryOperator"data-dojo-type="dijit/form/Select"></select>
+                            </div>
                         </div>
                         <div>
-                            <br><label>Operator</label> 
-                            <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryOperator"
-                                    data-dojo-type="dijit/form/Select"></select>
+                            <br><label id='queryValueText'>Value</label>
+                            <input id='queryValue'  class="ergControls"  data-dojo-attach-point="queryValue" id='queryValue'
+                                data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
+                                   class="ergControls" value=""
+                                data-dojo-type="dijit/form/NumberSpinner"></input></select>
                         </div>
                         <div>
-                            <br><label>Value</label>
-                            <input id='queryValue' type="number"  class="ergControls"  data-dojo-attach-point="queryValue"
-                                data-dojo-type="dijit/form/TextBox"></input> <br>
+                            <div style='display: inline-block;width: 177px;'>
+                                <br><label>Field Name</label>
+                                <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldName" id='queryFieldName' data-dojo-type="dijit/form/Select"></select>
+                            </div>
+                            <div style='display: block;width: 163px;float: right;'>
+                                <br><label>Field Value</label>
+                                <select disabled class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldValue" id='queryFieldValue' data-dojo-type="dijit/form/Select"></select>
+                            </div>
+                        </div>
+                        <br>
+                        <div>
+                        <label>Overlap Cell Size in Meters </label> <br>
+                        <input data-dojo-type="dijit/form/NumberSpinner"
+                               data-dojo-attach-point="overlapspinner"
+                               data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
+                               class="ergControls" value="" id='overlapspinner'/>
                         </div>
                     </div>
                     <br>
                     <div class="col-1-2">
-                            <div class="jimu-btn btn-solve" data-dojo-attach-point="btnSearch"
-                                 data-dojo-attach-event="onclick:addQuery">Add Query</div>
-                        </div>
+                        <div class="jimu-btn btn-solve" data-dojo-attach-point="btnSearch" data-dojo-attach-event="onclick:addQuery">Add Query</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -31,7 +31,7 @@ define([
     "dojo/dom",
     "dojo/dom-style",
     "dijit/form/Select",
-    //"dojox/form/CheckedMultiSelect",
+    "dojox/form/CheckedMultiSelect",
     "dijit/form/TextBox",
     "esri/geometry/jsonUtils",
     "dojo/_base/array",
@@ -39,10 +39,9 @@ define([
     "esri/layers/FeatureLayer",
     "jimu/dijit/DrawBox",
     "dojo/query",
-    "dojo/dom-construct",
-    "./FacilitiesPane"
+    "dojo/dom-construct"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct, FacilitiesPane) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // DemoWidget code goes here
 
@@ -61,27 +60,149 @@ define([
             scenarioName:null,
             queryname:null,
             querylistMaster:[],
-            incidentGraphic,
-
+            incidentGraphic:null,
+            inputFileData:null,
+            inputFileDataType:null,
+            outputrasterlayer:null,
 
             onChangelayer: function (newValue) {
-                this.selectedSpillSize = newValue;
+                this.queryFieldName.set('options',[]);
+                this.queryFieldName._updateSelection();
+                this.queryType.set('options',[]);
+                this.queryType._updateSelection();
+                for (var prop in this.config.layeroptions) {
+                    
+                    if(newValue == prop){
+                        
+                        var queryFieldChoices = [];
+                        for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
+                            queryFieldChoices[i] ={};
+                            queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i];
+                            queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i];
+                        }
+
+                        this.queryFieldName.addOption(queryFieldChoices);
+                        document.getElementById('overlapspinner').removeAttribute("disabled");
+                        //document.getElementById('queryFieldValue').setAttribute("disabled", false);
+                        document.getElementById('queryValue').removeAttribute("disabled");
+
+                        if(this.config.layeroptions[prop].GeoType == 'Polygon'){
+                            var filetype = [];
+                            for (var i = 0; i < this.config.queryTypePoly.length; i++) {
+                                filetype[i] =this.config.queryTypePoly[i];
+                            }
+                            this.queryType.addOption(filetype);
+                        }
+                        else if(this.config.layeroptions[prop].GeoType == 'Polyline'){
+                            var filetype = [];
+                            for (var i = 0; i < this.config.queryTypePoly.length; i++) {
+                                filetype[i] =this.config.queryTypePoly[i];
+                            }
+                            this.queryType.addOption(filetype);
+                        }
+                        else if(this.config.layeroptions[prop].GeoType == 'Point'){
+                            var filetype = [];
+                            for (var i = 0; i < this.config.queryTypePoint.length; i++) {
+                                filetype[i] =this.config.queryTypePoint[i];
+                            }
+                            this.queryType.addOption(filetype);
+                            document.getElementById('overlapspinner').setAttribute("disabled", true);
+                            this.overlapspinner.value = '';
+                            //document.getElementById('queryFieldValue').setAttribute("disabled", true);
+                            //document.getElementById('queryValue').setAttribute("disabled", true);
+                        }
+                    }
+                }
             },
             
             onChangeCustomMetrics: function (newValue) {
-                this.selectedCustomMetrics = newValue;
-                document.getElementById("predefinedQ").innerHTML = newValue;
+                var stringvalue = '';
+                for (var i = 0; i < newValue.length; i++) {
+                    if(i>0 &&stringvalue !=''){
+                       stringvalue+=';';
+                    }
+                    if(newValue[i]!="None"){
+                        stringvalue+=newValue[i];
+                    }
+                }
+                this.selectedCustomMetrics = stringvalue;
+                document.getElementById("predefinedQ").innerHTML = stringvalue;
             },
             
             onClearBtnClicked: function () {
                 this.spillGraphicsLayer.clear();
-            },
-            onSizeDirChange:function(value){
-                this.sizevalue = value;
+                this.selectedMaterialType= null;
+                this.selectedCustomMetrics= null;
+                this.ergGPChemicalService= null;
+                this.inputFileData= null;
+                this.outputrasterlayer = null;
+
+                this.queryLayer.set('value',[]);
+                this.queryLayer._updateSelection();
+                this.queryType.set('value',[]);
+                this.queryType._updateSelection();
+                this.queryOperator.set('value',[]);
+                this.queryOperator._updateSelection();
+                this.CustomMetrics.set('value',[]);
+                this.CustomMetrics._updateSelection();
+                this.drawToolbar.deactivate();
+                domStyle.set("downloadfile", {
+                    "display": 'none',
+                });
             },
 
             onChangequeryType:function(value){
-                //querylistMaster
+                this.queryOperator.set('options',[]);
+                this.queryOperator._updateSelection();
+                var queryOperator = [];
+                
+                document.getElementById('overlapspinner').setAttribute("disabled", true);
+                this.overlapspinner.value='';
+                //document.getElementById('queryFieldValue').setAttribute("disabled", true);
+                document.getElementById('queryValue').removeAttribute("disabled");
+                document.getElementById('queryValue').innerHTML='';
+                
+                dijit.byId('queryFieldName').set('disabled', false);
+                if(value == 'Presence'){
+                    for (var i = 0; i < this.config.queryOperatorPresence.length; i++) {
+                         queryOperator[i] ={};
+                         queryOperator[i].label =this.config.queryOperatorPresence[i];
+                         queryOperator[i].value =this.config.queryOperatorPresence[i];
+                    }
+                    //document.getElementById('queryFieldValue').setAttribute("disabled", false);
+                    document.getElementById('queryValue').setAttribute("disabled", true);
+                    document.getElementById('queryValueText').innerHTML = '';
+                }
+                else if(value == 'Count'){
+                    document.getElementById('queryValueText').innerHTML = 'Count';
+                }
+                else if(value == 'Overlap'){
+                    document.getElementById('overlapspinner').removeAttribute("disabled");
+                    this.overlapspinner.value = '';
+                    //document.getElementById('queryFieldValue').setAttribute("disabled", false);
+                    if(this.config.layeroptions[this.queryLayer.value].GeoType == 'Polygon')
+                    {
+                        document.getElementById('queryValueText').innerHTML = 'Area in (km2)';
+                    }
+                    else{
+                        document.getElementById('queryValueText').innerHTML = 'Distance (km)';
+                    }
+                }
+                //Distance
+                else{
+                    var queryOperator = [];
+                    for (var i = 0; i < this.config.queryOperator.length; i++) {
+                         queryOperator[i] ={};
+                         queryOperator[i].label =this.config.queryOperator[i];
+                         queryOperator[i].value =this.config.queryOperator[i];
+                    }
+                    document.getElementById('queryValueText').innerHTML = 'Distance in meters';
+                    
+                    dijit.byId('queryFieldName').set('disabled', true);
+                    this.queryFieldName.value = '';
+                }
+
+                this.queryOperator.addOption(queryOperator);
             },
 
             onChangequeryOperator:function(value){
@@ -95,32 +216,42 @@ define([
             queryNameChange:function(value){
                 this.queryname = value;
             },
-
-            ERGRequestFailed: function (error) {
-
-            },
-
             
             //asynchronous job completed successfully
             displayERGServiceResults: function (results) {
                  
                 //add raster to map
-
                 domStyle.set("loadingrunscreen", {
                     "display": 'none',
                 });
-                //domAttr.removeAttr("runbut", "disabled");
+                domStyle.set("downloadfile", {
+                    "display": 'inherit',
+                });
+                document.getElementById("downloadfileLinkdetails").href = results.url;
+                results.name = "Output Site Screening Layer";
+                this.outputrasterlayer = results;
+
+                this.map.addLayer(results);
+            },
+
+            addDownloadOption:function(val){
+                document.getElementById("downloadfileLink").href = val.value;
             },
 
             onERGGPComplete: function (jobInfo) {
 
                 if (jobInfo.jobStatus !== "esriJobFailed") {
                     this.ergGPJobID = jobInfo.jobId;
-                    this.ergGPChemicalService.getResultData(jobInfo.jobId, "Output",
+                    this.ergGPChemicalService.getResultData(jobInfo.jobId, "OutputURL",
+                            lang.hitch(this, this.addDownloadOption));
+                    this.ergGPChemicalService.getResultImageLayer(jobInfo.jobId, "OutputRaster",null,
                             lang.hitch(this, this.displayERGServiceResults));
                 }
                 else{
-                    alert('Job Failed, Please try again')
+                    alert('Job Failed, Please try again');
+                    domStyle.set("loadingrunscreen", {
+                        "display": 'none',
+                    });
                 }
             },
 
@@ -158,19 +289,28 @@ define([
 
             addGraphic: function (evt) {
                 //deactivate the toolbar and clear existing graphics
-                this.drawToolbar.deactivate();
+                //this.drawToolbar.deactivate();
                 this.map.enableMapNavigation();
-                this.incidentGraphic = evt.geometry;
-                
+
                 // figure out which symbol to use
                 var symbol;
                 if (evt.geometry.type === "polygon") {
                     symbol = new SimpleFillSymbol(
-                        SimpleFillSymbol.STYLE_SOLID,
-                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 0]), 2),
+                        SimpleFillSymbol.STYLE_NULL,
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 255]), 2),
                         new Color([0, 0, 255, 0.5]));
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
+
+                this.incidentGraphic = '';
+
+                for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
+
+                    this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
+                    if(i<this.spillGraphicsLayer.graphics.length-1){
+                        this.incidentGraphic += ";";
+                    }
+                }
             },
 
             bindDrawToolbar: function (evt) {
@@ -184,17 +324,56 @@ define([
             },
 
             addQuery:function(){
+                
+                if(this.queryName.displayedValue == ""){
+                    alert('Please Select a Query Name.');
+                }
+                else{
+                    if(this.queryType.value=='Distance'){
+                        this.queryFieldName.value = '';
+                    }
+                    if(this.queryType.value!='Overlap'){
+                        this.overlapspinner.displayedValue = '';
+                    }
 
+                    this.queryFieldValue.value ='';
+                    this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+this.queryLayer.value+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});    
+                }
             },
 
             onSolve: function (evt) {
+                
+                this.drawToolbar.deactivate();
+                domStyle.set("downloadfile", {
+                    "display": 'none',
+                });
 
-                if(this.incidentGraphic == null){
+                var params = {};
+
+                if(this.incidentGraphic == null && this.inputFileData == null){
                     alert("Please add polygon geometry input or upload a file.");
                 }
-                //params['InputType'] = 'Shapefile';
-                //params['InputType'] = 'Model Output';
+                else if(this.scenarioName.displayedValue == ""){
+                    alert("Please Select a Scenario Name.");   
+                }
+                else if(this.selectedCustomMetrics == null ||this.selectedCustomMetrics == ''){
+                    alert("Please Select a Query Option (s).");   
+                }
                 else{
+                    if(this.inputFileData != null){
+                        params['AOI_Input'] = this.inputFileData;
+                        params['AOI_Input_Type'] = this.inputFileDataType;
+                    }
+                    else {
+                        params['AOI_Input_Type'] = 'AOI';
+                        params['AOI_Input'] = this.incidentGraphic;
+                    }
+
+                    params['Query_Type'] = 'Custom';
+                    //params['Query_Input'] = 'Query1,Dolphins,Count,>,1,Count_,,,';
+                    //params['Query_Input'] ="Query1,Dolphins,Count,>,10,Count_,,,; Query2, Dredged Areas,Overlap,<,5,,,25,; Query3, Shoreline, Distance,<,10000,,,,"
+                    params['Query_Input'] =this.selectedCustomMetrics;
+                    params['Cell_Size'] = this.winDirSpinner.value;
                     //domAttr.addAttr("runbut", "disabled");
                     domStyle.set("loadingrunscreen", {
                         "display": 'inherit',
@@ -202,9 +381,9 @@ define([
                     this.maploading = new LoadingIndicator();
                     var t = document.getElementById("loadingrunscreen");
                     this.maploading.placeAt(t);
-                }
-                
-                               
+                    this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
+                            lang.hitch(this, this.onERGGPStatusCallback));
+                }              
             },
 
             postCreate: function () {
@@ -213,7 +392,7 @@ define([
 
             startup: function () {
                 this.inherited(arguments);
-                console.log('startup');
+                var that = this;
 
                 //add CORS servers
                 for (var key in this.config) {
@@ -245,7 +424,6 @@ define([
                             title: this.nls.tabDemo,
                             content: this.tabNode2
                         }
-                        
                     ],
                     selected: this.nls.conditions
                 }, this.tabERG);
@@ -261,16 +439,30 @@ define([
                     layerOption[i] ={};
                     layerOption[i].label =this.config.layers[i];
                     layerOption[i].value =this.config.layers[i];
+
+                    if(i==0){
+                        var queryFieldChoices = [];
+                        for (var tt = 0; tt < this.config.layeroptions[this.config.layers[i]].Fields.length; tt++) {
+                            queryFieldChoices[tt] ={};
+                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i]].Fields[tt];
+                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i]].Fields[tt];
+                        }
+
+                        this.queryFieldName.addOption(queryFieldChoices);
+                        //to bigin
+                        dijit.byId('queryFieldName').set('disabled', true);
+                        document.getElementById('overlapspinner').setAttribute("disabled", true);
+                    }
                 }
 
                 this.queryLayer.addOption(layerOption);
                 this.own(on(this.queryLayer, "change", lang.hitch(this, this.onChangelayer)));
 
                 var queryType = [];
-                for (var i = 0; i < this.config.queryType.length; i++) {
+                for (var i = 0; i < this.config.queryTypePoly.length; i++) {
                      queryType[i] ={};
-                     queryType[i].label =this.config.queryType[i];
-                     queryType[i].value =this.config.queryType[i];
+                     queryType[i].label =this.config.queryTypePoly[i].label;
+                     queryType[i].value =this.config.queryTypePoly[i].value;
                 }
 
                 this.queryType.addOption(queryType);
@@ -283,26 +475,50 @@ define([
                      queryOperator[i].value =this.config.queryOperator[i];
                 }
 
-
                 this.queryOperator.addOption(queryOperator);
                 this.own(on(this.queryOperator, "change", lang.hitch(this, this.onChangequeryOperator)));
 
                 this.own(on(this.scenarioName, "change", lang.hitch(this, this.scenarioNameChange)));
                 this.own(on(this.queryName, "change", lang.hitch(this, this.queryNameChange)));
 
+                var filetype = [];
+                for (var i = 0; i < this.config.filetype.length; i++) {
+                    filetype[i] ={};
+                    filetype[i].label =this.config.filetype[i];
+                    filetype[i].value =this.config.filetype[i];
+                }
+                this.shpType.addOption(filetype);
+                this.own(on(this.shpType, "change", lang.hitch(this, this.onChangefiletype)));
+                
                 var CustomMetricsChoices = [];
                 for (var i = 0; i < this.config.custom.length; i++) {
-                    CustomMetricsChoices[i] =this.config.custom[i];
+                    CustomMetricsChoices[i] ={};
+                    CustomMetricsChoices[i].label =this.config.custom[i].label;
+                    CustomMetricsChoices[i].value =this.config.custom[i].value;
                 }
-                this.CustomMetrics.addOption(CustomMetricsChoices);
-                this.own(on(this.CustomMetrics, "change", lang.hitch(this, this.onChangeCustomMetrics)));
+                this.CustomMetricsSite.addOption(CustomMetricsChoices);
+                this.own(on(this.CustomMetricsSite, "change", lang.hitch(this, this.onChangeCustomMetrics)));
 
-                document.getElementById("btn-upload").onchange = function() {
-                    //document.getElementById("form").submit();
-                };
-
-                document.getElementById("form").onsubmit = function() {
-                    //do something with value
+                document.getElementById("infile-site").onchange = function() {
+                    var gpUploadURL = that.config.url_upload;
+                
+                    var requestHandle = esri.request({  
+                        url: gpUploadURL,  
+                        form: dojo.byId("uploadFormSite"),  
+                        content : {  
+                          f : "json"  
+                         } , 
+                        load: uploadSucceeded,  
+                        error: uploadFailed  
+                    });  
+                      
+                    function uploadFailed(response) {                                                                                                                                                                                                                                                             
+                      alert('Upload Failed, Please try again');
+                    }  
+                    function uploadSucceeded(response) {                                                                                                                                                                                                                                                             
+                      this.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      this.inputFileDataType = "";
+                    }
                 };
 
                 //spill location graphics layer

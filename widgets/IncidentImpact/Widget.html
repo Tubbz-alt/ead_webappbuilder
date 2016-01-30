@@ -1,5 +1,5 @@
 <div style="height:100%;">
-    <div class="item" style="width:100%;height:100%;">
+    <div class="item" style="width:100%;height:100%;font-size:14px;">
         <div class="content" style="height:100%;">
             <div data-dojo-attach-point="tabERG">
                 <div data-dojo-attach-point="tabNode1" class="ergTabs">
@@ -7,18 +7,15 @@
                     <div data-dojo-attach-point="drawSpillInfo">
                         <div id="Polygon" title="${nls.spillLocation}" class="searchFeaturesIcon searchPoint"></div>
                     </div>
-
                     <div>
                         <label>${nls.Stressors}</label> <br><br>
                         <select class="impControls" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-attach-point="Stressors" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
                     </div>
                     <br>
-                    <br>
                     <div>
                         <label>${nls.obs}</label> <br><br>
                         <select class="impControls"  data-dojo-attach-point="obs" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
                     </div>
-                    <br>
                     <br>
                     <div>
                         <label>${nls.Habitats}</label> <br><br>
@@ -26,11 +23,8 @@
                     </div>
                     <br>
                     <div>
-                        <label>${nls.CustomMetrics}</label> <br><br>
-                        <select class="impControls"  data-dojo-attach-point="CustomMetrics"
-                                data-dojo-type="dijit/form/Select"></select>
-
-                        <br>
+                        <label>${nls.CustomMetrics}</label> <br> <br>
+                        <select class="impControls" data-dojo-props="dropDown:true,multiple:true,required:false" data-dojo-attach-point="CustomMetrics" data-dojo-type="dojox/form/CheckedMultiSelect"></select>
                         <label id="customvalue"></label>
                     </div>
 
@@ -45,10 +39,9 @@
                         </div>
                     </div>
                     <div id='loadingrun' style='display:none;padding-top: 10px;'>
-                        File be downloaded when finished running.
+                        File will be downloaded when finished running.
                     </div>
                 </div>
-
                 <div data-dojo-attach-point="tabNode2" class="ergTabs">
                     <div data-dojo-attach-point="progressBar" data-dojo-type="dijit/ProgressBar" data-dojo-props='indeterminate:true' style="display:none;"></div>
                     <div class="results-section" data-dojo-attach-point="resultsSection" style="display:none;">
@@ -70,9 +63,59 @@
                     </div>
                     <br>
                     <br>
-                    <form id="form" action="url">
-                        <input type="file" id="btn-upload" class="uploadBtn" name="pic" accept=".zip">
+                    <form id="uploadFormImpact" method="post" enctype="multipart/form-data">
+                        <input type="file" id="infile-impact"class="uploadBtn" name="pic" accept=".zip">
                     </form>
+                    <br>
+                    <br>
+                    <br>
+                    <label>Shapefile Type</label> <br>
+                        <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="shpType_site"
+                                data-dojo-type="dijit/form/Select"></select>
+                </div>
+                <div data-dojo-attach-point="tabNode4" class="ergTabs">
+                    <div style='padding-top: 5px;'>
+                        (Optional) Select Custom Query Metric Parameters.
+                    </div>
+                    <br>
+                    <div class="resultsList" data-dojo-attach-point="facilitiesListSection" />
+                     <div>
+                        <label>Metric Name</label> <br>
+                        <input id='matricName'  class="ergControls"  data-dojo-attach-point="matricName"
+                                data-dojo-type="dijit/form/TextBox"></input>
+                    </div>
+                    <br>
+                    <div>
+                        <div>
+                            <label>Layer Name</label> 
+                            <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="metricLayer"
+                                    data-dojo-type="dijit/form/Select"></select>
+                        </div>
+                        <div>
+                            <br><label>Analysis Type</label> 
+                            <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="metricType"
+                                    data-dojo-type="dijit/form/Select"></select>
+                        </div>
+                        <div>
+                            <br><label>Field to Summarize (Optional)</label>
+                            <input id='metricField' type="number"  class="ergControls"  data-dojo-attach-point="metricField"
+                                data-dojo-type="dijit/form/Select"></input> <br>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="col-1-2">
+                        <div class="jimu-btn btn-solve" data-dojo-attach-point="btnSearch"
+                             data-dojo-attach-event="onclick:addMatric">Add Custom Metric</div>
+                    </div>
+                </div>
+                <div data-dojo-attach-point="tabNode3" class="ergTabs">
+                    <div style='padding-top: 10px;padding-bottom:5px'>
+                        Summary Table will be displayed here.
+                    </div>
+                    <div id="grid" style="width: 100%; height: 100%;"
+                      data-dojo-type="dojox.grid.DataGrid"
+                      data-dojo-props="">
+                    </div>
                 </div>
             </div>
         </div>

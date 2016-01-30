@@ -10,6 +10,7 @@ define([
     "dijit/ProgressBar",
     "dijit/form/NumberSpinner",
     "esri/layers/ArcGISDynamicMapServiceLayer",
+    'jimu/PanelManager',
     "dojo/_base/lang",
     "dojo/on",
     "dojo/dom",
@@ -23,7 +24,7 @@ define([
     "dojo/dom-construct"
 ],
     function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, List, utils, esriConfig, urlUtils, 
-        ProgressBar, NumberSpinner,ArcGISDynamicMapServiceLayer, lang, on, dom, domStyle, Select, TextBox, jsonUtils, array, html, query, domConstruct, FacilitiesPane) {
+        ProgressBar, NumberSpinner,ArcGISDynamicMapServiceLayer,  PanelManager,lang, on, dom, domStyle, Select, TextBox, jsonUtils, array, html, query,domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // DemoWidget code goes here
 
@@ -37,7 +38,6 @@ define([
             //wigdget control events
             onChangeCalculateBy: function (newValue) {
                 //this.eadlayer.setVisibleLayers([]);
-
                 this.eadlayer.setVisibleLayers([newValue]);
             },
 
@@ -48,16 +48,11 @@ define([
                     this.map.removeLayer(layer);
                   } 
                 }, this);*/
-                this.eadlayer.setVisibleLayers([]);
-            },            
-
-            convertTime: function (unix_timestamp) {
-
-            },
-
-            onSolve: function (evt) {
-                
-            },
+                //this.eadlayer.setVisibleLayers([]);
+                if(this.eadlayer != ''){
+                    this.map.removeLayer(this.eadlayer);
+                }
+            },   
 
             postCreate: function () {
                 this.inherited(arguments);
@@ -136,15 +131,28 @@ define([
                 option[18].label = "Turbidity";
                 option[18].value = 18;
 
-                this.calculateBy.addOption(option);
+                //this.calculateBy.addOption(option);
 
                 //switch layer
-                this.own(on(this.calculateBy, "change", lang.hitch(this, this.onChangeCalculateBy)));
+                //this.own(on(this.calculateBy, "change", lang.hitch(this, this.onChangeCalculateBy)));
+            },
+            onSolve: function(){
 
                 this.eadlayer = new ArcGISDynamicMapServiceLayer(this.config.StressorURL, {id:"ead_stressor"});
                 this.map.addLayer(this.eadlayer);
+                //var t = WidgetManager.getInstance().getAllWidgets();
+                //WidgetManager.getInstance().loadWidget(t);
+                var t = {
+                    "uri": "widgets/LayerList/Widget",
+                    "version": "1.3",
+                    "id": "widgets_LayerList_Widget_17",
+                    "name": "LayerList",
+                    "label": "Layer List",
+                    "index": 2
+                  }
+                //PanelManager.getInstance().getAllPanels();
+                PanelManager.getInstance().showPanel(t);
             },
-
             onOpen: function () {
                 console.log('onOpen');
             },

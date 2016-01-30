@@ -2,6 +2,12 @@
     margin: -14px -14px 10px -14px;
 }
 
+#widgets_Stressors_Widget_35_panel{
+    height: 311px !important;
+    left: 620px !important;
+    /*
+    overflow-y:hidden!important;*/
+}
 .jimu-widget-stressors .dijitArrowButtonContainer{
     width: 30px;
 }

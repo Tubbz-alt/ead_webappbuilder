@@ -6,6 +6,6 @@ define({
         tabERG: "Parameters",
         tabFacilities: "Construct Query",
         tabDemo: "Upload File",
-        noresult: "Upload File to run Incident Impact."
+        noresult: "(Optional) Upload File to run Site Screening Tool."
     }
 });

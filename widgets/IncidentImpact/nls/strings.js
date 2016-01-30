@@ -10,6 +10,8 @@ define({
         tabERG: "Parameters",
         //tabFacilities: "Custom Settings",
         tabDemo: "Upload File",
-        noresult: "Upload File to run Incident Impact."
+        tabResults: "Results",
+        tabCustom: "Custom Metrics",
+        noresult: "(Optional) Upload File to run Incident Impact."
     }
 });

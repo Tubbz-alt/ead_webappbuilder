@@ -1,17 +1,17 @@
 <div style="height:100%;">
-    <div class="item" style="width:95%;height:100%;">
+    <div class="item" style="width:100%;height:100%;font-size:14px">
         <div class="content" style="height:100%;">
             <div data-dojo-attach-point="tabStressor">
-                <div data-dojo-attach-point="tabNode1" class="ergTabs">
+                <div data-dojo-attach-point="tabNode1">
+                    <div style="padding-left:53px">
+                        <label>Add Sensitivity Stressor Layer</label>
+                    </div>
                     <br>
-                    <div>
+                    <!--<div>
                         <label>${nls.calculateBy}</label> <br>
                         <select class="ergControls" data-dojo-props="maxHeight: 200"
                                 data-dojo-attach-point="calculateBy" data-dojo-type="dijit/form/Select"></select>
-                    </div>
-
-                    <br><br><br>
-
+                    </div> -->
                     <!-- BUTTONS -->
                     <div class="jimu-r-row play-section">
                         <div class="col-1-2">
@@ -21,6 +21,10 @@
                         <div class="col-1-2">
                             <div class="jimu-btn btn-clear" data-dojo-attach-point="btnClear" data-dojo-attach-event="onclick:onClearBtnClicked">${nls.labelClear}</div>
                         </div>
+                    </div>
+
+                    <div style="font-style:italic;padding-top: 20px;font-size: 14px;padding-left: 14px;">
+                        <label>Layer will be added to the Layer List Widget</label>
                     </div>
                 </div>
             </div>

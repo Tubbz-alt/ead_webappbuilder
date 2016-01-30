@@ -337,3 +337,10 @@
     margin-bottom: 5px;
     font-style: italic;
 }
+
+.dojoxGridSortNode{
+    background-color: gray !important;
+}
+.dojoxGridRow{
+    background-color: gray !important;
+}

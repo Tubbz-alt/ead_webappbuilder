@@ -2,8 +2,9 @@
     margin: -14px -14px 10px -14px;
 }
 #widgets_SiteScreening_Widget_33_panel{
-    height: 550px !important;
-    width: 450px !important;
+    height: 590px !important;
+    width: 430px !important;
+    left:5px !important;
 }
 .dijitInputContainer{
     height: 30px !important;
@@ -25,6 +26,15 @@
     background-image:url('../images/top.png');
     cursor:pointer;
     font-weight:bold;
+}
+.dijitReset .dijitButtonContents{
+    background-color: grey !important;
+}
+.dijitReset .dijitMenuItemLabel{
+    background-color: grey !important;
+}
+.dijitReset .dijitMenuItemIconCell{
+    background-color: grey !important;
 }
 
 .dojoxCheckedMultiSelectMenu{

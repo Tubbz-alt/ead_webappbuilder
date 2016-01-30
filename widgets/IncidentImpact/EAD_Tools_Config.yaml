@@ -5,51 +5,51 @@ EAD_dbConnection:
   Username: sde
   Password: Password123
   Database Name: EAD_CoastalAtlas
-EAD_FileGeodatabase: E:\Data\EAD\CoastalAtlas.gdb
-EAD_FileGeodatabase_TEST: W:\CONTRACTS\2015\15-241 EAD\CoastalAtlas\CoastalAtlas_v2.gdb
+EAD_FileGeodatabase_LIVE: E:\Data\EAD\CoastalAtlas.gdb
+EAD_FileGeodatabase: W:\CONTRACTS\2015\15-241 EAD\CoastalAtlas\CoastalAtlas_v2.gdb
 OutputURL: https://gis.asascience.com/arcgis/rest/directories/arcgisjobs/eadcoastalatlas/incidentimpactstool_gpserver
 EAD_dbStructure:
   AdministrativeBoundary:
-    Abu Dhabi Boundary: {FC_Name: ADBoundary,GeoType: Polygon}
-    Abu Dhabi Territorial Waters: {FC_Name: ADTerritorialWaters,GeoType: Polygon}
-    Emirates: {FC_Name: Emirates,GeoType: Polygon}
-    Island Ownership: {FC_Name: IslandOwnership,GeoType: Polygon}
-    Protected Areas: {FC_Name: ProtectedArea,GeoType: Polygon}
-    Study Area: {FC_Name: study_area,GeoType: Polygon}
-    Zone Boundaries: {FC_Name: zone_boundary,GeoType: Polygon}  
+    Abu Dhabi Boundary: {FC_Name: ADBoundary,GeoType: Polygon, Fields: [OBJECTID_1, OBJECTID, MUNICIPALN, MUNICIPA_1, MUNICIPALP, MUNICIPA_2, FCODE, PROJECTID, DATASOURCE, DATASOUR_1, MUNICIPALI, EMIRATEID, LASTUPDATE, VERSIONNAM, EDITORNAME, EDITTASK, EDITTOOL]}
+    Abu Dhabi Territorial Waters: {FC_Name: ADTerritorialWaters,GeoType: Polygon, Fields: [OBJECTID]}
+    Emirates: {FC_Name: Emirates,GeoType: Polygon, Fields: [OBJECTID, Name, EmirateID, NameAr, CreatedOn, ValidatedOn, Comment, CommentAr, SecurityLevel, SecurityLevelAr, CaptureSource, CaptureSourceAr, ConfidenceLevel]}
+    Island Ownership: {FC_Name: IslandOwnership,GeoType: Polygon, Fields: [OBJECTID_1, OBJECTID, Id, Municipali, Ownership]}
+    Protected Areas: {FC_Name: ProtectedArea,GeoType: Polygon, Fields: [OBJECTID, ProtectedAreaID, ProtectedAreaType, Name, DateProp, DateDes, Features, Other, Locality, LandOwner, Management, Threats, EAD_Owner, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, NameAr, ProtectedArea, Type]}
+    Study Area: {FC_Name: study_area,GeoType: Polygon, Fields: [OBJECTID, Id]}
+    Zone Boundaries: {FC_Name: zone_boundary,GeoType: Polygon, Fields: [OBJECTID, NAME, CITY]}  
   AlgalBloom:
-    Algal Bloom Sites: {FC_Name: AlgalBloomSite,GeoType: Point}
+    Algal Bloom Sites: {FC_Name: AlgalBloomSite,GeoType: Point, Fields: [OBJECTID, AlgalSiteID, AlgalDate, AlgalStrain, ToxicSpecies, FishMortality, EnvImpact, ChlorophyllChem, ChlorophyllRemote, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, GlobalID, AlgalAreaID, Location, AlgalBloomID, N, E, AreaCovered]}
   CulturalHeritage:
-    Archaeological Sites: {FC_Name: ArchaeologicalArea,GeoType: Polygon}  
+    Archaeological Sites: {FC_Name: ArchaeologicalArea,GeoType: Polygon, Fields: [OBJECTID]}  
   Habitat:
-    Habitat Areas: {FC_Name: Habitat,GeoType: Polygon}
+    Habitat Areas: {FC_Name: Habitat,GeoType: Polygon, Fields: [OBJECTID, HabitatTypeNo, HabitatCategory, HabitatSubTypeNo, Habitat, Area_KM, Area_HA, Id, MMU_HA, RuleID, Override, Value, Risk, SENS_ID, Value_ID]}
   Fauna:
-    Birds: {FC_Name: Birds,GeoType: Point}
-    Dolphins: {FC_Name: Dolphins,GeoType: Point}
-    Dugongs: {FC_Name: Dugongs,GeoType: Point}
-    Dugong Density: {FC_Name: DugongDensity,GeoType: Point}
-    Turtle Nests: {FC_Name: TurtleNests,GeoType: Point}
-    Turtles: {FC_Name: Turtles,GeoType: Point}
-    Mammals: {FC_Name: Mammals,GeoType: Point}
-    Reptiles: {FC_Name: Reptiles,GeoType: Point}    
+    Birds: {FC_Name: Birds,GeoType: Point, Fields: [OBJECTID, Type, Species, CaptureSource, Confidence, Reliable, NameAr, ProjectID, BirdsID, FCode, FKey, Status, Sites, Season, SiteType, CreatedOn, ValidatedOn, Comment, SecurityLevel, CaptureSourceAr, ConfidenceLevel, OperationCode, SurveyType, RandomNumber, ObservationDate, Locality, Recorder, Project, BirdCode, CommonName, Count_, Sex, Age, North, East, Habitat, Activity, Health, LatinName, ArabicName, Sample, Comments, GridNumber]}
+    Dolphins: {FC_Name: Dolphins,GeoType: Point, Fields: [OBJECTID, SPECIESName, Count_, ADULTS, CALVES, NEONATES, NOTES, X, Y, ObservationDate, ObserverName, Habitat, RecordedDate, RecordedTime, SeaCondition, Season, Transect, Visibility, Source, Zone, Species]}
+    Dugongs: {FC_Name: Dugongs,GeoType: Point, Fields: [OBJECTID, ID, Description, Observers, Period, Name, DescriptionAr, ObserversAr, PeriodAr, NameAr, ProjectID, ObservedOn, FKey, FCode, SurvDate, SurvTime, Siting, CreatedOn, ValidatedOn, CaptureSource, CaptureSourceAr, Comment, CommentAr, SecurityLevel, SecurityLevelAr, ConfidenceLevel, Altitude_Speed, AreaCovered, Elevation, Habitat, Pressure, RecordedDate, RecordedTime, SeaCondition, Transect, Visibility, Waypoint, X, Y, Zone, Source, Season, Count_, Dugong_MC, Notes, Species]}
+    Dugong Density: {FC_Name: DugongDensity,GeoType: Point, Fields: [OBJECTID, FID_, Count_, Depth, Grass, Island, Pred_raw, Pred, FID_1]}
+    Turtle Nests: {FC_Name: TurtleNests,GeoType: Point, Fields: [OBJECTID, ID, IslandName, ObservationDate, N, E, Location, TrackWidth, DistanceFromHTL, Comments, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, TrackPattern, TrackStatus]}
+    Turtles: {FC_Name: Turtles,GeoType: Point, Fields: [OBJECTID, ID, Name, Confidence, Reliable, Description, Observers, NameAr, DescriptionAr, ObserversAr, ProjectID, ObservedOn, FKey, FCode, SurvDate, SurvTime, Habitat, Sighting, Habitat_N, CaptureSource, CaptureSourceAr, SecurityLevel, CommentAr, Comment, CreatedOn, ValidatedOn, SecurityLevelAr, ConfidenceLevel, Altitude_Speed, AreaCovered, Elevation, Pressure, RecordedDate, RecordedTime, SeaCondition, Season, Transect, Visibility, Waypoint, X, Y, Zone, Count_, Source, Species]}
+    Mammals: {FC_Name: Mammals,GeoType: Point, Fields: [OBJECTID, Altitude, Name, Species, Substrate, Sighting, Sex, Notes, Recorder, NameAr, SpeciesAr, SubstrateAr, SightingAr, SexAr, NotesAr, RecorderAr, SurveyDate, SurveyTime, SpeciesCount, Count_, WeightKg, MamalsPointsID, Comment, CommentAr, CaptureSource, CaptureSourceAr, SecurityLevel, SecurityLevelAr, ValidatedOn, CreatedOn, ConfidenceLevel, X, Y, HabitatStatus, BaselineGrid, ProjectName, LocationName]}
+    Reptiles: {FC_Name: Reptiles,GeoType: Point, Fields: [OBJECTID, Altitude, Recorder, Species, Activity, Notes, LocationName, RecorderAr, SpeciesAr, ActivityAr, NotesAr, NameAr, ObservedOn, SurveyDate, SurveyTime, Count_, SightingType, AssociatedVeg, SightingTypeAr, ReptilesPointsID, Taxa, Family, Substrate, SubstrateAr, SecurityLevel, SecurityLevelAr, CreatedOn, ValidatedOn, CaptureSource, CaptureSourceAr, Comment, CommentAr, ConfidenceLevel, MicroHabitat, ProjectName, BaselineGrid, X, Y, HabitatStatus]}    
   Fisheries:
-    Aqua Culture Sites: {FC_Name: AquaCultureFarms,GeoType: Point}
-    Buhoor Areas: {FC_Name: BuhoorArea,GeoType: Polygon}
-    Fishing Ground Grid: {FC_Name: FishingGroundGrid,GeoType: Polygon}
-    Landing Sites: {FC_Name: LandingSite,GeoType: Point}
-    Pearl Diving Sites: {FC_Name: PearlDiving,GeoType: Polygon}
+    Aqua Culture Sites: {FC_Name: AquaCultureFarms,GeoType: Point, Fields: [OBJECTID, FacilityName, WaterSource, AquaCultureSystem, FarmingType, ProductionOutput, EADPermit, IsLicensed, Confidential, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
+    Buhoor Areas: {FC_Name: BuhoorArea,GeoType: Polygon, Fields: [OBJECTID, BuhoorID, SiteName, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, EcoSiteID, SectorID, CommunityID, SecurityLevelAr, SiteNameAr, CommentAr, CaptureSourceAr, ValidatedByAr]}
+    Fishing Ground Grid: {FC_Name: FishingGroundGrid,GeoType: Polygon, Fields: [OBJECTID, GridCellsID, GridCellName, LandmarkAr, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, EcoSiteID, SectorID, CommunityID, SecurityLevelAr, GridCellNameAr, CommentAr, CaptureSourceAr, ValidatedByAr, Landmark]}
+    Landing Sites: {FC_Name: LandingSite,GeoType: Point, Fields: [OBJECTID, LandingSiteID, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, LandingSiteStatus, EcoSiteID, SectorID, CommunityID, LandingSiteAr, CommentAr, LandingSite, Latitude, Longitude]}
+    Pearl Diving Sites: {FC_Name: PearlDiving,GeoType: Polygon, Fields: [OBJECTID, FCode, FKey, Source, ProjectId, Reliable, Confidence, Name, SectorID, CommunityID, ReliableAr, ConfidenceAr, NameAr, PearlDivingID, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
   Infrastructure:
-    Power Stations: {FC_Name: PowerStations,GeoType: Point}
-    Communication Towers: {FC_Name: CommunicationTowers,GeoType: Point}
-    Road Network: {FC_Name: RoadSegment,GeoType: Polyline}
-    Industrial Facilities: {FC_Name: IndustrialFacility,GeoType: Polygon}
-    Desalination Plants: {FC_Name: DesalPlant,GeoType: Polygon}
-    Oil Fields: {FC_Name: OilField,GeoType: Polygon}
+    Power Stations: {FC_Name: PowerStations,GeoType: Point, Fields: [OBJECTID, FCode, FKey, Source, ProjectId, AreaName, Reliable, Confidence, Company, Location, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
+    Communication Towers: {FC_Name: CommunicationTowers,GeoType: Point, Fields: [OBJECTID, FCode, FKey, Source, ProjectId, Reliable, Confidence, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
+    Road Network: {FC_Name: RoadSegment,GeoType: Polyline, Fields: [OBJECTID, RoadID, NameEng, NameArabic, Speed, Location, Lanes, Light, Owner, RoadNumber, ECode, ClassDot, Zone, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, SectorID, CommunityID, SecurityLevelAr, LocationAr, LightAr, OwnerAr, ECodeAr, ClassDotAr, ZoneAr, CommentAr, CaptureSourceAr, ValidatedByAr, Name, NameAr]}
+    Industrial Facilities: {FC_Name: IndustrialFacility,GeoType: Polygon, Fields: [OBJECTID, FacilityID, FacName, Owner, UNFCCC, Capacity, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, Name, SectorID, CommunityID, SecurityLevelAr, UNFCCCAr, FacNameAr, OwnerAr, CapacityAr, CommentAr, CaptureSourceAr, NameAr, FacilityIDAr, ValidatedByAr]}
+    Desalination Plants: {FC_Name: DesalPlant,GeoType: Polygon, Fields: [OBJECTID, PlantID, PlantType, ProdCap, Quarter, Year, AvDlyPro, PlantOp, FeedWtrSrc, ProdUse, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, SectorID, CommunityID, PlantTypeAr, QuarterAr, FeedWtrSrcAr, SecurityLevelAr, ProdUseAr, PlantOpAr, CommentAr, CaptureSourceAr, ValidatedByAr]}
+    Oil Fields: {FC_Name: OilField,GeoType: Polygon, Fields: [OBJECTID, PlantID, PlantType, ProdCap, Quarter, Year, AvDlyPro, PlantOp, FeedWtrSrc, ProdUse, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, SectorID, CommunityID, PlantTypeAr, QuarterAr, FeedWtrSrcAr, SecurityLevelAr, ProdUseAr, PlantOpAr, CommentAr, CaptureSourceAr, ValidatedByAr]}
   Hydrography:
-    Bathymetry: {FC_Name: ADBathymetry,GeoType: Polyline}
-    Shoreline: {FC_Name: ADShoreline,GeoType: Polyline}
-    Dredged Areas: {FC_Name: DredgingChannel,GeoType: Polygon}
-    Outfall Locations: {FC_Name: OceanOutfall,GeoType: Point}
+    Bathymetry: {FC_Name: ADBathymetry,GeoType: Polyline, Fields: [OBJECTID, Id, Contour]}
+    Shoreline: {FC_Name: ADShoreline,GeoType: Polyline, Fields: [OBJECTID, Id, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
+    Dredged Areas: {FC_Name: DredgingChannel,GeoType: Polygon, Fields: [OBJECTID, FCode, FKey, Source, ProjectId, Reliable, Confidence, Perimeter, CreatedOn, ValidatedOn, CaptureSource, ConfidenceLevel, SecurityLevel, Comment]}
+    Outfall Locations: {FC_Name: OceanOutfall,GeoType: Point, Fields: [OBJECTID, DisOutID, PlantID, DisDepth, DisType, AvDisVol, ProdUse, OutfallType, Comment, CaptureSource, CreatedOn, ValidatedOn, ValidatedBy, ConfidenceLevel, SecurityLevel, FCode, DocID, SectorID, CommunityID, DisTypeAr, ProdUseAr, OutfallTypeAr, CommentAr, CaptureSourceAr, ValidatedByAr, SecurityLevelAr]}
   HabitatSensitivity:
   HabitatValue:
   HabitatVulnerability:
@@ -112,14 +112,14 @@ ObservationLayers:
   Reptiles: [Count, Species]
 Predefined Site Screening Queries:
   Test1:
-    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: null}
+    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count,FieldValue: null,OverlapCellSize: null,Weight: null}
     Q2: {FC: Shoreline,Type: Distance,Operator: '>=',Value: 10000,Field: null,FieldValue: null,OverlapCellSize: null,Weight: null}
-    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count_,FieldValue: 333,OverlapCellSize: null,Weight: null}
+    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count,FieldValue: 333,OverlapCellSize: null,Weight: null}
     Q4: {FC: Oil Fields,Type: Overlap,Operator: '>',Value: 0,Field: NAME,FieldValue: null,OverlapCellSize: 5,Weight: null}
   Test2:
-    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: 2}
+    Q1: {FC: Dugongs,Type: Count,Operator: '>',Value: 1,Field: Count,FieldValue: null,OverlapCellSize: null,Weight: 2}
     Q2: {FC: Shoreline,Type: Distance,Operator: '>=',Value: 10000,Field: null,FieldValue: null,OverlapCellSize: null,Weight: 1}
-    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count_,FieldValue: 333,OverlapCellSize: null,Weight: 2}
+    Q3: {FC: Birds,Type: Presence,Operator: 'True',Value: null,Field: Count,FieldValue: 333,OverlapCellSize: null,Weight: 2}
     Q4: {FC: Oil Fields,Type: Overlap,Operator: '>',Value: 0,Field: NAME,FieldValue: null,OverlapCellSize: 5,Weight: 100}
   Test3:
-    Q1: {FC: Dugongs,Type: Count,Operator: 'Range',Value: 10-50,Field: Count_,FieldValue: null,OverlapCellSize: null,Weight: null}
+    Q1: {FC: Dugongs,Type: Count,Operator: 'Range',Value: 10-50,Field: Count,FieldValue: null,OverlapCellSize: null,Weight: null}

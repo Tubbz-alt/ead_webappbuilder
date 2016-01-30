@@ -40,10 +40,11 @@ define([
     "esri/layers/FeatureLayer",
     "jimu/dijit/DrawBox",
     "dojo/query",
-    "dojo/dom-construct",
-    "./FacilitiesPane"
+    "dojox/data/CsvStore",
+    "dojox/grid/DataGrid",
+    "dojo/dom-construct"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, domAttr, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct, FacilitiesPane) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, domAttr, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query,CsvStore,DataGrid, domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // DemoWidget code goes here
 
@@ -62,6 +63,8 @@ define([
             ergGPActive: null,
             executionType: null,
             maploading:null,
+            inputFileData:null,
+            inputFileDataType:null,
 
             onChangeStressors: function (newValue) {
                 var stringvalue = '';
@@ -74,6 +77,10 @@ define([
                 this.selectedStressor = stringvalue;
             },
 
+            onChangefiletype:function(newValue){
+                this.inputFileDataType = newValue;
+            },
+            
             onChangeHabitats: function (newValue) {
                 var stringvalue = '';
                 for (var i = 0; i < newValue.length; i++) {
@@ -97,12 +104,101 @@ define([
             },
             
             onChangeCustomMetrics: function (newValue) {
-                this.selectedCustomMetrics = newValue;
-                document.getElementById("customvalue").innerHTML = newValue;
+                //multivalues
+                var stringvalue = '';
+                for (var i = 0; i < newValue.length; i++) {
+                    if(i>0){
+                       stringvalue+=';';
+                    }
+                    if(newValue[i]!="None"){
+                        stringvalue+=newValue[i].replace(' - ',',');
+                    }
+                }
+                this.selectedCustomMetrics = stringvalue;
+                document.getElementById("customvalue").innerHTML = stringvalue;
+            },
+
+            onChangequeryLayer: function (newValue) {
+                this.metricField.set('options',[]);
+                this.metricField._updateSelection();
+                this.metricType.set('options',[]);
+                this.metricType._updateSelection();
+                for (var prop in this.config.layeroptions) {
+                    
+                    if(newValue == prop){
+                        var queryTypeChoices = [];
+                        if(this.config.layeroptions[prop].GeoType == 'Point'){
+                            queryTypeChoices[0] ={};
+                            queryTypeChoices[0].label ="Count";
+                            queryTypeChoices[0].value ="Count";
+                            this.metricType.addOption(queryTypeChoices);
+                        }
+                        else if(this.config.layeroptions[prop].GeoType == 'Polygon'){
+                            queryTypeChoices[0] ={};
+                            queryTypeChoices[0].label ="Count";
+                            queryTypeChoices[0].value ="Count";
+                            queryTypeChoices[1] ={};
+                            queryTypeChoices[1].label ="Area";
+                            queryTypeChoices[1].value ="Size";
+                            this.metricType.addOption(queryTypeChoices);
+                        }
+                        else if(this.config.layeroptions[prop].GeoType == 'Polyline'){
+                            queryTypeChoices[0] ={};
+                            queryTypeChoices[0].label ="Count";
+                            queryTypeChoices[0].value ="Count";
+                            queryTypeChoices[1] ={};
+                            queryTypeChoices[1].label ="Length";
+                            queryTypeChoices[1].value ="Size";
+                            this.metricType.addOption(queryTypeChoices);
+                        }
+
+                        var queryFieldChoices = [];
+                        for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
+                            queryFieldChoices[i] ={};
+                            queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i];
+                            queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i];
+                        }
+
+                        this.metricField.addOption(queryFieldChoices);
+                    }
+                }
+            },
+            onChangequeryType: function (newValue) {
+                
             },
             
             onClearBtnClicked: function () {
                 this.spillGraphicsLayer.clear();
+                var newStore = new dojo.data.ItemFileReadStore({data: {  identifier: "",  items: []}});   
+                dijit.byId("grid").setStore(newStore, {}); 
+
+                this.obs.set('value',[]);
+                this.obs._updateSelection();
+                this.Habitats.set('value',[]);
+                this.Habitats._updateSelection();
+                this.Stressors.set('value',[]);
+                this.Stressors._updateSelection();
+                this.CustomMetrics.set('value',[]);
+                this.CustomMetrics._updateSelection();
+                this.selectedHabitat= null;
+                this.selectedStressor= null;
+                this.selectedObsType= null;
+                this.selectedCustomMetrics=null;
+                this.inputFileData=null;
+                this.matricName.value = null;
+                // this.metricLayer.set('value',[]);
+                // this.metricLayer._updateSelection();
+                this.matricName.attr('value', null);
+                this.drawToolbar.deactivate();
+            },
+
+            addMatric:function(){
+                if(this.matricName.displayedValue != ""){
+                    this.CustomMetrics.addOption({"label":this.matricName.displayedValue,"value":this.metricLayer.value+","+this.metricType.value+","+this.metricField.value});    
+                }
+                else{
+                    alert('Please Select a Metric Name.')
+                }
             },
 
             //asynchronous job completed successfully
@@ -110,11 +206,22 @@ define([
 
                 if (results.paramName === "Output") {
                     window.open(results.value,"_blank");
+
+                    var recordsStoreForGrid= new dojox.data.CsvStore({url: results.value});
+
+                    var layoutheaders = [
+                        [
+                          { field: "Analysis", name: "Analysis", width: 10 },
+                          { field: "Metric", name: "Metric", width: 10 },
+                          { field: "CustomFootprint1", name: "CustomFootprint1", width: 'auto' }
+                       ]
+                    ];
+                    dijit.byId("grid").setStructure(layoutheaders);
+                    dijit.byId("grid").setStore(recordsStoreForGrid, {});
                 }
                 domStyle.set("loadingrun", {
                     "display": 'none',
                 });
-                //domAttr.removeAttr("runbut", "disabled");
             },
 
             onERGGPComplete: function (jobInfo) {
@@ -125,7 +232,10 @@ define([
                             lang.hitch(this, this.displayERGServiceResults));
                 }
                 else{
-                    alert('Job Failed, Please try again')
+                    alert('Job Failed, Please try again');
+                    domStyle.set("loadingrunscreen", {
+                        "display": 'none',
+                    });
                 }
             },
 
@@ -163,19 +273,27 @@ define([
 
             addGraphic: function (evt) {
                 //deactivate the toolbar and clear existing graphics
-                this.drawToolbar.deactivate();
+                //this.drawToolbar.deactivate();
                 this.map.enableMapNavigation();
-                this.incidentGraphic = evt.geometry;
 
                 // figure out which symbol to use
                 var symbol;
                 if (evt.geometry.type === "polygon") {
                     symbol = new SimpleFillSymbol(
                         SimpleFillSymbol.STYLE_SOLID,
-                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 0]), 2),
-                        new Color([0, 0, 255, 0.5]));
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 0]), 1),
+                        new Color([123, 205, 232, 0.5]));
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
+                this.incidentGraphic = '';
+
+                for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
+
+                    this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
+                    if(i<this.spillGraphicsLayer.graphics.length-1){
+                        this.incidentGraphic += ";";
+                    }
+                }
             },
 
             bindDrawToolbar: function (evt) {
@@ -189,54 +307,82 @@ define([
             },
 
             onSolve: function (evt) {
+                this.drawToolbar.deactivate();
                 var params = {};
-                params['InputType'] = 'AOI';
-                params['Input'] = this.incidentGraphic;
-                if(this.incidentGraphic == null){
+
+                var recordsStoreForGrid= new dojox.data.CsvStore({url: "Summary.csv"});
+
+                var layoutheaders = [
+                    [
+                      { field: "Analysis", name: "Analysis", width: 10 },
+                      { field: "Metric", name: "Metric", width: 10 },
+                      { field: "CustomFootprint1", name: "CustomFootprint1", width: 'auto' }
+                   ]
+                ];
+                dijit.byId("grid").setStructure(layoutheaders);
+                dijit.byId("grid").setStore(recordsStoreForGrid, {});
+
+                if(this.incidentGraphic == null && this.inputFileData == null){
                     alert("Please add polygon geometry input or upload a file.");
                 }
-                //params['InputType'] = 'Shapefile';
-                //params['InputType'] = 'Model Output';
                 else{
-
-                    if(this.selectedCustomMetrics == null || this.selectedCustomMetrics == 'none'){
-                        if(this.selectedStressor == null){
-                            alert("Please Select a Stressor");
-                        }
-                        else if(this.selectedHabitat == null){
-                            alert("Please Select a Habitat");   
-                        }
-                        else if(this.selectedObsType == null){
-                             alert("Please Select a Observation");   
-                        }
-                        else {
-                            //domAttr.addAttr("runbut", "disabled");
-                            domStyle.set("loadingrun", {
-                                "display": 'inherit',
-                              });
-                            this.maploading = new LoadingIndicator();
-                            var t = document.getElementById("loadingrun");
-                            this.maploading.placeAt(t);
-
-                            params['Observations'] = this.selectedObsType;
-                            params['Habitats'] = this.selectedHabitat;
-                            params['Stressors'] = this.selectedStressor;
-                            this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
-                                        lang.hitch(this, this.onERGGPStatusCallback));
-                        }           
+                    if(this.inputFileData != null){
+                        params['Input '] = this.inputFileData;
+                        params['InputType'] = this.inputFileDataType;
+                    }
+                    else {
+                        params['InputType'] = 'AOI';
+                        params['Input'] = this.incidentGraphic;
+                    }
+                    var oneValueSelected = false;
+                    if(this.selectedCustomMetrics != null){
+                        if( this.selectedCustomMetrics != 'None'){
+                            params['CustomMetrics'] =this.selectedCustomMetrics;   
+                            oneValueSelected=true; 
+                        } 
+                        else{
+                            params['CustomMetrics'] = '';
+                        }      
                     }
                     else{
+                        params['CustomMetrics'] = '';
+                    }
+                    if(this.selectedStressor != null){
+                        params['Stressors'] = this.selectedStressor;
+                        oneValueSelected=true;
+                    }
+                    else{
+                        params['Stressors'] = '';
+                    }
+                    if(this.selectedHabitat != null){
+                        params['Habitats'] = this.selectedHabitat;  
+                        oneValueSelected=true;
+                    }
+                    else{
+                        params['Habitats'] = '';
+                    }
+                    if(this.selectedObsType != null){
+                        params['Observations'] = this.selectedObsType;
+                        oneValueSelected=true;
+                    }
+                    else{
+                        params['Observations'] = '';
+                    }
+                    if(oneValueSelected == false){
+                        alert("Please Select at least one parameter for the model.");
+                    }
+                    else{
+                        //domAttr.addAttr("runbut", "disabled");
                         domStyle.set("loadingrun", {
-                                "display": 'inherit',
-                              });
+                            "display": 'inherit',
+                          });
                         this.maploading = new LoadingIndicator();
                         var t = document.getElementById("loadingrun");
                         this.maploading.placeAt(t);
-
-                        params['CustomMetrics'] =this.selectedCustomMetrics;
                         this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
-                                        lang.hitch(this, this.onERGGPStatusCallback));
+                            lang.hitch(this, this.onERGGPStatusCallback));
                     }
+                    
                 }
             },
 
@@ -245,8 +391,9 @@ define([
             },
 
             startup: function () {
+
                 this.inherited(arguments);
-                console.log('startup');
+                that = this;
 
                 //add CORS servers
                 for (var key in this.config) {
@@ -271,13 +418,17 @@ define([
                             content: this.tabNode1
                         },
                         {
+                            title: this.nls.tabCustom,
+                            content: this.tabNode4
+                        },
+                        {
                             title: this.nls.tabDemo,
                             content: this.tabNode2
-                        }
-                        /*{
-                            title: this.nls.tabFacilities,
+                        },
+                        {
+                            title: this.nls.tabResults,
                             content: this.tabNode3
-                        }*/
+                        }
                     ],
                     selected: this.nls.conditions
                 }, this.tabERG);
@@ -304,9 +455,17 @@ define([
                     obsOption[i].label =this.config.observations[i];
                     obsOption[i].value =this.config.observations[i];
                 }
-
                 this.obs.addOption(obsOption);
                 this.own(on(this.obs, "change", lang.hitch(this, this.onChangeobservations)));
+
+                var filetype = [];
+                for (var i = 0; i < this.config.filetype.length; i++) {
+                    filetype[i] ={};
+                    filetype[i].label =this.config.filetype[i];
+                    filetype[i].value =this.config.filetype[i];
+                }
+                this.shpType_site.addOption(filetype);
+                this.own(on(this.shpType_site, "change", lang.hitch(this, this.onChangefiletype)));
 
                 var habitatsOption = [];
                 for (var i = 0; i < this.config.habitats.length; i++) {
@@ -319,17 +478,63 @@ define([
 
                 var CustomMetricsChoices = [];
                 for (var i = 0; i < this.config.custom.length; i++) {
+                    CustomMetricsChoices[i] ={};
+                    //CustomMetricsChoices[i].label =this.config.custom[i].label;
                     CustomMetricsChoices[i] =this.config.custom[i];
                 }
                 this.CustomMetrics.addOption(CustomMetricsChoices);
                 this.own(on(this.CustomMetrics, "change", lang.hitch(this, this.onChangeCustomMetrics)));
 
-                document.getElementById("btn-upload").onchange = function() {
-                    //document.getElementById("form").submit();
-                };
+                var queryLayerChoices = [];
+                var i = 0;
+                for (var prop in this.config.layeroptions) {
+                    queryLayerChoices[i] ={};
+                    queryLayerChoices[i].label =prop;
+                    queryLayerChoices[i].value =prop;
+                    if(i==0){
+                        var queryFieldChoices = [];
+                        for (var t = 0; t < this.config.layeroptions[prop].Fields.length; t++) {
+                            queryFieldChoices[t] ={};
+                            queryFieldChoices[t].label =this.config.layeroptions[prop].Fields[t];
+                            queryFieldChoices[t].value =this.config.layeroptions[prop].Fields[t];
+                        }
 
-                document.getElementById("form").onsubmit = function() {
-                    //do something with value
+                        this.metricField.addOption(queryFieldChoices);
+                    }
+                    i++;
+                }
+                this.metricLayer.addOption(queryLayerChoices);
+                this.own(on(this.metricLayer, "change", lang.hitch(this, this.onChangequeryLayer)));
+                
+                var queryTypeChoices = [];
+                queryTypeChoices[0] ={};
+                queryTypeChoices[0].label ="Count";
+                queryTypeChoices[0].value ="Count";
+                queryTypeChoices[1] ={};
+                queryTypeChoices[1].label ="Area";
+                queryTypeChoices[1].value ="Size";
+                this.metricType.addOption(queryTypeChoices);
+
+                document.getElementById("infile-impact").onchange = function() {
+                    var gpUploadURL = that.config.url_upload;
+                
+                    var requestHandle = esri.request({  
+                        url: gpUploadURL,  
+                        form: dojo.byId("uploadFormImpact"),  
+                        content : {  
+                          f : "json"  
+                         } , 
+                        load: uploadSucceeded,  
+                        error: uploadFailed
+                    });  
+                      
+                    function uploadFailed(response) {                                                                                                                                                                                                                                                             
+                      alert('Upload Failed, Please try again');
+                    }  
+                    function uploadSucceeded(response) {                                                                                                                                                                                                                                                             
+                      this.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      this.inputFileDataType = "";
+                    }  
                 };
 
                 //spill location graphics layer
@@ -339,7 +544,6 @@ define([
                 //ERG coverage layer
                 this.ergGraphicsLayer = new GraphicsLayer();
                 this.map.addLayer(this.ergGraphicsLayer);
-
                 
                 this.drawToolbar = new Draw(this.map);
                 this.own(on(this.drawToolbar, "draw-end", lang.hitch(this, this.addGraphic)));
@@ -484,11 +688,6 @@ define([
                 var symbol = new SimpleFillSymbol(style, outlineSymbol, color);
                 return symbol;
             },
-
-            _clear: function () {
-                this._clearCharts();
-            },
-
 
             _setHightLightSymbol:function(g){
                 switch(g.geometry.type){
