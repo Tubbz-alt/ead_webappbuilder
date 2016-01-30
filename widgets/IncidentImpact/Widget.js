@@ -410,11 +410,15 @@ define([
                         if (this._isValidUrl(this.config[key])) {
                             var url = this._parseUrl(this.config[key]);
                             if (!this._itemExists(url.hostname, esri.config.defaults.io.corsEnabledServers)) {
-                                esri.config.defaults.io.corsEnabledServers.push(url.hostname);
-                                urlUtils.addProxyRule({
-                                    urlPrefix: url.hostname,
-                                    proxyUrl: "/dotNetProxy/proxy.ashx"
-                                })                                
+                                if(that.config.proxy != ''){
+                                    esri.config.defaults.io.corsEnabledServers.push(url.hostname);
+                                    //esriConfig.defaults.io.proxyUrl = "proxy.aspx";  
+                                    //esriConfig.defaults.io.alwaysUseProxy = true;
+                                    urlUtils.addProxyRule({
+                                        urlPrefix : that.config.proxyprefix,
+                                        proxyUrl : that.config.proxy
+                                    });
+                                }                               
                             }   
                         }
                     }
@@ -533,10 +537,6 @@ define([
 
                     var gpUploadURL = that.config.url_upload;
                     
-                    urlUtils.addProxyRule({
-                        urlPrefix : that.config.proxyprefix,
-                        proxyUrl : that.config.proxy
-                    });
                     var form = dojo.byId("uploadFormImpact");
                     var requestHandle = esri.request({  
                         url: gpUploadURL,  
@@ -589,15 +589,7 @@ define([
             },
 
             destroy: function () {
-                if (this.chartLayer) {
-                    this.map.removeLayer(this.chartLayer);
-                    this.chartLayer = null;
-                }
-
-                if (this.facilitiesGraphicsLayer) {
-                    this.map.removeLayer(this.facilitiesGraphicsLayer);
-                    this.facilitiesGraphicsLayer = null;
-                }
+                
             },
 
             _setFeatureSymbol: function (f) {

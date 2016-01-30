@@ -1,9 +1,9 @@
 {
   "proxy":"",
-  "proxyprefix":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services",
+  "proxyprefix":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services",
   "token":"",
-  "url":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3",
-  "url_upload":"http://aeadvsa077-ead.erwda.int:6080/arcgis/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/uploads/upload",
+  "url":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3",
+  "url_upload":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/uploads/upload",
   "habitats": [
       "Mudflats",
       "Tidal flats",

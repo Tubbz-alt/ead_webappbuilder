@@ -26,7 +26,7 @@
                     <input data-dojo-type="dijit/form/NumberSpinner"
                            data-dojo-attach-point="winDirSpinner"
                            value="5000" id='winDirSpinner'
-                           data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
+                           data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0,pattern:'#'}"
                            class="ergControls"/>
                     <br>
                     <!-- BUTTONS -->
@@ -94,8 +94,8 @@
                         </div>
                         <div>
                             <br><label id='queryValueText'>Value</label>
-                            <input id='queryValue'  class="ergControls"  data-dojo-attach-point="queryValue" id='queryValue'
-                                data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
+                            <input class="ergControls"  data-dojo-attach-point="queryValue" id='queryValue'
+                                data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0,pattern:'#'}"
                                    class="ergControls" value=""
                                 data-dojo-type="dijit/form/NumberSpinner"></input></select>
                         </div>
@@ -114,7 +114,7 @@
                         <label>Overlap Cell Size in Meters </label> <br>
                         <input data-dojo-type="dijit/form/NumberSpinner"
                                data-dojo-attach-point="overlapspinner"
-                               data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0}"
+                               data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0,pattern:'#'}"
                                class="ergControls" value="" id='overlapspinner'/>
                         </div>
                     </div>

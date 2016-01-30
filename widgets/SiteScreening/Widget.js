@@ -38,10 +38,11 @@ define([
     "dojo/_base/html",
     "esri/layers/FeatureLayer",
     "jimu/dijit/DrawBox",
-    "dojo/query",
+    "esri/tasks/query", 
+    "esri/tasks/QueryTask",
     "dojo/dom-construct"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query, domConstruct) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, Query, QueryTask, domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
             // DemoWidget code goes here
 
@@ -57,13 +58,43 @@ define([
             ergGPChemicalService: null,
             ergGPJobID: null,
             maploading:null,
-            scenarioName:null,
+            //scenarioName:null,
             queryname:null,
             querylistMaster:[],
             incidentGraphic:null,
             inputFileData:null,
             inputFileDataType:null,
             outputrasterlayer:null,
+
+            //get distinct values 
+            onChangequeryFieldName:function (newValue){
+
+              // var qTask = new QueryTask(this.config.dataurl);
+              // filterquery = new Query();
+
+              // filterquery.where = "1=1";
+              // filterquery.outFields = [newValue];
+              // filterquery.returnDistinctValues=true;
+
+              // filterquery.returnGeometry = false;
+              // // execute the query
+              // qTask.execute(filterquery).then(function (featureSet) {
+              //       var features, i;
+
+              //       features = arrayUtils.map(featureSet.features, function (feature) {
+              //         return feature.attributes[newValue];
+              //       });
+              //       // sort the list
+              //       features.sort();
+              //       var queryvalueChoices = [];
+              //       for (var i = 0; i < features.length; i++) {
+              //           queryvalueChoices[i] ={};
+              //           queryvalueChoices[i].label =this.config.layeroptions[prop].Fields[i];
+              //           queryvalueChoices[i].value =this.config.layeroptions[prop].Fields[i];
+              //       }
+              //       this.queryfieldvalue.addOption(queryvalueChoices);
+              // });
+            },
 
             onChangelayer: function (newValue) {
                 this.queryFieldName.set('options',[]);
@@ -135,7 +166,9 @@ define([
                 this.selectedCustomMetrics= null;
                 this.ergGPChemicalService= null;
                 this.inputFileData= null;
-                this.outputrasterlayer = null;
+                if(this.outputrasterlayer != null){
+                    this.map.removeLayer(this.outputrasterlayer );
+                }
 
                 this.queryLayer.set('value',[]);
                 this.queryLayer._updateSelection();
@@ -143,9 +176,12 @@ define([
                 this.queryType._updateSelection();
                 this.queryOperator.set('value',[]);
                 this.queryOperator._updateSelection();
-                this.CustomMetrics.set('value',[]);
-                this.CustomMetrics._updateSelection();
+                this.CustomMetricsSite.set('value',[]);
+                this.CustomMetricsSite._updateSelection();
                 this.drawToolbar.deactivate();
+                this.queryValue.attr('value', '');
+                this.scenarioName.attr('value', '');
+
                 domStyle.set("downloadfile", {
                     "display": 'none',
                 });
@@ -158,11 +194,18 @@ define([
                 
                 document.getElementById('overlapspinner').setAttribute("disabled", true);
                 this.overlapspinner.value='';
+                
+                //this will need to change when distint values
                 //document.getElementById('queryFieldValue').setAttribute("disabled", true);
                 document.getElementById('queryValue').removeAttribute("disabled");
                 document.getElementById('queryValue').innerHTML='';
                 
-                dijit.byId('queryFieldName').set('disabled', false);
+                //for now
+                dijit.byId('queryFieldName').set('disabled', true);
+                this.queryFieldName.value='';
+                this.queryValue.attr('value', '');
+                this.overlapspinner.attr('value', '');
+
                 if(value == 'Presence'){
                     for (var i = 0; i < this.config.queryOperatorPresence.length; i++) {
                          queryOperator[i] ={};
@@ -172,9 +215,11 @@ define([
                     //document.getElementById('queryFieldValue').setAttribute("disabled", false);
                     document.getElementById('queryValue').setAttribute("disabled", true);
                     document.getElementById('queryValueText').innerHTML = '';
+                    document.getElementById('overlapspinner').removeAttribute("disabled");
                 }
                 else if(value == 'Count'){
                     document.getElementById('queryValueText').innerHTML = 'Count';
+                    dijit.byId('queryFieldName').set('disabled', false);
                 }
                 else if(value == 'Overlap'){
                     document.getElementById('overlapspinner').removeAttribute("disabled");
@@ -210,7 +255,7 @@ define([
             },
 
             scenarioNameChange:function(value){
-                this.scenarioName = value
+                //this.scenarioName = value
             },
 
             queryNameChange:function(value){
@@ -219,7 +264,9 @@ define([
             
             //asynchronous job completed successfully
             displayERGServiceResults: function (results) {
-                 
+                if(this.outputrasterlayer != null){
+                    this.map.removeLayer(this.outputrasterlayer );
+                }
                 //add raster to map
                 domStyle.set("loadingrunscreen", {
                     "display": 'none',
@@ -329,11 +376,23 @@ define([
                     alert('Please Select a Query Name.');
                 }
                 else{
-                    if(this.queryType.value=='Distance'){
+                    //for now
+                    //this will need to change when distint values
+                    if(this.queryType.value!='Count'){
                         this.queryFieldName.value = '';
                     }
-                    if(this.queryType.value!='Overlap'){
+
+                    if(this.queryType.value!='Overlap'&&this.queryType.value!='Presence'){
                         this.overlapspinner.displayedValue = '';
+                    }
+                    else{
+                        if(this.overlapspinner.displayedValue == ''){
+                            this.overlapspinner.displayedValue=0;
+                        }
+                    }
+                    if(this.queryType.value=='Presence'){
+                        this.queryValue.displayedValue = '';
+                        this.queryValue.value = '';
                     }
 
                     this.queryFieldValue.value ='';
@@ -400,11 +459,16 @@ define([
                         if (this._isValidUrl(this.config[key])) {
                             var url = this._parseUrl(this.config[key]);
                             if (!this._itemExists(url.hostname, esri.config.defaults.io.corsEnabledServers)) {
-                                esri.config.defaults.io.corsEnabledServers.push(url.hostname);
-                                urlUtils.addProxyRule({
-                                    urlPrefix: url.hostname,
-                                    proxyUrl: "/dotNetProxy/proxy.ashx"
-                                })                                
+                                
+                                if(that.config.proxy != ''){
+                                    esri.config.defaults.io.corsEnabledServers.push(url.hostname);
+                                    //esriConfig.defaults.io.proxyUrl = "proxy.aspx";  
+                                    //esriConfig.defaults.io.alwaysUseProxy = true;
+                                    urlUtils.addProxyRule({
+                                        urlPrefix : that.config.proxyprefix,
+                                        proxyUrl : that.config.proxy
+                                    });
+                                }                               
                             }   
                         }
                     }
@@ -449,7 +513,8 @@ define([
                         }
 
                         this.queryFieldName.addOption(queryFieldChoices);
-                        //to bigin
+                        this.own(on(this.queryFieldName, "change", lang.hitch(this, this.onChangequeryFieldName)));
+                        //FOR NOW to begin
                         dijit.byId('queryFieldName').set('disabled', true);
                         document.getElementById('overlapspinner').setAttribute("disabled", true);
                     }
@@ -504,14 +569,7 @@ define([
                     if(this.spillGraphicsLayer != null){
                         this.incidentGraphic == null;
                         this.spillGraphicsLayer.clear();
-                    }
-
-                    //esriConfig.defaults.io.proxyUrl = "proxy.aspx";  
-                    //esriConfig.defaults.io.alwaysUseProxy = true;
-                    urlUtils.addProxyRule({
-                        urlPrefix : that.config.proxyprefix,
-                        proxyUrl : that.config.proxy
-                    });
+                    }                    
 
                     var gpUploadURL = that.config.url_upload;
                     var form = dojo.byId("uploadFormSite");
@@ -569,15 +627,7 @@ define([
             },
 
             destroy: function () {
-                if (this.chartLayer) {
-                    this.map.removeLayer(this.chartLayer);
-                    this.chartLayer = null;
-                }
-
-                if (this.facilitiesGraphicsLayer) {
-                    this.map.removeLayer(this.facilitiesGraphicsLayer);
-                    this.facilitiesGraphicsLayer = null;
-                }
+                
             },
 
             _setFeatureSymbol: function (f) {
