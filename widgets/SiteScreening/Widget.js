@@ -470,6 +470,7 @@ define([
 
                     if(addquery == true){
                         this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+dijit.byId('queryLayer').attr('displayedValue')+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});        
+                        alert('Query '+this.queryName.displayedValue+' added to Paramter List.');
                     }
                 }
             },

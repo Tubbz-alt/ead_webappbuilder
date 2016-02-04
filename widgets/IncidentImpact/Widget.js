@@ -191,9 +191,10 @@ define([
             addMatric:function(){
                 if(this.matricName.displayedValue != ""){
                     this.CustomMetrics.addOption({"label":this.matricName.displayedValue,"value":this.metricLayer.value+","+this.metricType.value+","+this.metricField.value});    
+                    alert('Metric '+this.matricName.displayedValue+' added to Paramter List.');
                 }
                 else{
-                    alert('Please Select a Metric Name.')
+                    alert('Please Select a Metric Name.');
                 }
             },
 
