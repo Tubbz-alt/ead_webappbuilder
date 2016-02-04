@@ -78,7 +78,7 @@
                                 data-dojo-type="dijit/form/TextBox"></input>
                     </div><br>
                     <div><label>Query Layer Name</label>
-                        <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryLayer"
+                        <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryLayer" id="queryLayer"
                                 data-dojo-type="dijit/form/Select"></select>
                     </div>
                     <div>
@@ -95,9 +95,8 @@
                         <div>
                             <br><label id='queryValueText'>Value</label>
                             <input class="ergControls"  data-dojo-attach-point="queryValue" id='queryValue'
-                                data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0,pattern:'#'}"
-                                   class="ergControls" value=""
-                                data-dojo-type="dijit/form/NumberSpinner"></input></select>
+                            class="ergControls" value=""
+                                data-dojo-type="dijit/form/NumberTextBox"></input></select>
                         </div>
                         <div>
                             <div style='display: inline-block;width: 177px;'>
@@ -106,15 +105,14 @@
                             </div>
                             <div style='display: block;width: 163px;float: right;'>
                                 <br><label>Field Value</label>
-                                <select disabled class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldValue" id='queryFieldValue' data-dojo-type="dijit/form/Select"></select>
+                                <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldValue" id='queryFieldValue' data-dojo-type="dijit/form/Select"></select>
                             </div>
                         </div>
                         <br>
                         <div>
                         <label>Overlap Cell Size in Meters </label> <br>
-                        <input data-dojo-type="dijit/form/NumberSpinner"
+                        <input data-dojo-type="dijit/form/NumberTextBox"
                                data-dojo-attach-point="overlapspinner"
-                               data-dojo-props="smallDelta:1, constraints:{min:0,max:10000,places:0,pattern:'#'}"
                                class="ergControls" value="" id='overlapspinner'/>
                         </div>
                     </div>

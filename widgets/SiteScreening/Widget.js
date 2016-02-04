@@ -13,7 +13,6 @@ define([
     "esri/graphic",
     "esri/geometry/Point",
     "esri/symbols/SimpleMarkerSymbol",
-    "esri/geometry/Polyline",
     "esri/symbols/SimpleLineSymbol",
     "esri/geometry/Polygon",
     "esri/symbols/SimpleFillSymbol",
@@ -33,22 +32,18 @@ define([
     "dijit/form/Select",
     "dojox/form/CheckedMultiSelect",
     "dijit/form/TextBox",
+    "dijit/form/NumberTextBox",
     "esri/geometry/jsonUtils",
     "dojo/_base/array",
     "dojo/_base/html",
-    "esri/layers/FeatureLayer",
     "jimu/dijit/DrawBox",
     "esri/tasks/query", 
     "esri/tasks/QueryTask",
     "dojo/dom-construct"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, Query, QueryTask, domConstruct) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox,NumberTextBox, jsonUtils, array, html, DrawBox, Query, QueryTask, domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
-            // DemoWidget code goes here
-
-            //please note that this property is be set by the framework when widget is loaded.
-            //templateString: template,
-
+            
             baseClass: 'jimu-widget-erg',
             name: 'SCREENING',
             spillGraphicsLayer: null,
@@ -58,7 +53,6 @@ define([
             ergGPChemicalService: null,
             ergGPJobID: null,
             maploading:null,
-            //scenarioName:null,
             queryname:null,
             querylistMaster:[],
             incidentGraphic:null,
@@ -69,41 +63,55 @@ define([
             //get distinct values 
             onChangequeryFieldName:function (newValue){
 
-              // var qTask = new QueryTask(this.config.dataurl);
-              // filterquery = new Query();
+              if(newValue != "No Field"){
+                  var that = this;
+                  var qTask = new QueryTask(this.config.dataurl+'/'+this.queryLayer.value);
+                  
+                  if(this.config.token != ''){
+                    qTask.token = this.config.token;
+                  }
+                  
+                  filterquery = new Query();
+                  filterquery.where = "1=1";
+                  filterquery.outFields = [newValue];
+                  filterquery.returnDistinctValues=true;
 
-              // filterquery.where = "1=1";
-              // filterquery.outFields = [newValue];
-              // filterquery.returnDistinctValues=true;
+                  filterquery.returnGeometry = false;
 
-              // filterquery.returnGeometry = false;
-              // // execute the query
-              // qTask.execute(filterquery).then(function (featureSet) {
-              //       var features, i;
+                  // execute the query
+                  qTask.execute(filterquery).then(function (featureSet) {
+                        var features, i;
 
-              //       features = arrayUtils.map(featureSet.features, function (feature) {
-              //         return feature.attributes[newValue];
-              //       });
-              //       // sort the list
-              //       features.sort();
-              //       var queryvalueChoices = [];
-              //       for (var i = 0; i < features.length; i++) {
-              //           queryvalueChoices[i] ={};
-              //           queryvalueChoices[i].label =this.config.layeroptions[prop].Fields[i];
-              //           queryvalueChoices[i].value =this.config.layeroptions[prop].Fields[i];
-              //       }
-              //       this.queryfieldvalue.addOption(queryvalueChoices);
-              // });
+                        features = array.map(featureSet.features, function (feature) {
+                          return feature.attributes[newValue];
+                        });
+                        // sort the list
+                        features.sort();
+                        var queryvalueChoices = [];
+
+                        for (var i = 0; i < features.length; i++) {
+                            queryvalueChoices[i] ={};
+                            queryvalueChoices[i].label =features[i];
+                            queryvalueChoices[i].value =features[i];
+                        }
+                        that.queryFieldValue.set('options',[]);
+                        that.queryFieldValue._updateSelection();
+                        that.queryFieldValue.addOption(queryvalueChoices);
+                  });
+              }
+              
             },
 
-            onChangelayer: function (newValue) {
+            onChangelayer: function (newValue,t) {
+
                 this.queryFieldName.set('options',[]);
-                this.queryFieldName._updateSelection();
                 this.queryType.set('options',[]);
+                this.queryFieldName._updateSelection();
                 this.queryType._updateSelection();
+                
                 for (var prop in this.config.layeroptions) {
                     
-                    if(newValue == prop){
+                    if(dijit.byId('queryLayer').attr('displayedValue') == prop){
                         
                         var queryFieldChoices = [];
                         for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
@@ -111,37 +119,48 @@ define([
                             queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i];
                             queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i];
                         }
+                        queryFieldChoices[i] ={};
+                        queryFieldChoices[i].label = 'No Field';
+                        queryFieldChoices[i].value = 'No Field';
 
                         this.queryFieldName.addOption(queryFieldChoices);
+
                         document.getElementById('overlapspinner').removeAttribute("disabled");
-                        //document.getElementById('queryFieldValue').setAttribute("disabled", false);
+                        document.getElementById('queryFieldValue').removeAttribute("disabled");
                         document.getElementById('queryValue').removeAttribute("disabled");
 
+                        var filetype = [];
+
                         if(this.config.layeroptions[prop].GeoType == 'Polygon'){
-                            var filetype = [];
                             for (var i = 0; i < this.config.queryTypePoly.length; i++) {
                                 filetype[i] =this.config.queryTypePoly[i];
                             }
-                            this.queryType.addOption(filetype);
                         }
                         else if(this.config.layeroptions[prop].GeoType == 'Polyline'){
-                            var filetype = [];
                             for (var i = 0; i < this.config.queryTypePoly.length; i++) {
                                 filetype[i] =this.config.queryTypePoly[i];
                             }
-                            this.queryType.addOption(filetype);
                         }
-                        else if(this.config.layeroptions[prop].GeoType == 'Point'){
-                            var filetype = [];
+                        //if(this.config.layeroptions[prop].GeoType == 'Point')
+                        else {
                             for (var i = 0; i < this.config.queryTypePoint.length; i++) {
                                 filetype[i] =this.config.queryTypePoint[i];
                             }
-                            this.queryType.addOption(filetype);
                             document.getElementById('overlapspinner').setAttribute("disabled", true);
                             this.overlapspinner.value = '';
-                            //document.getElementById('queryFieldValue').setAttribute("disabled", true);
-                            //document.getElementById('queryValue').setAttribute("disabled", true);
+                            document.getElementById('queryFieldValue').setAttribute("disabled", true);
+                            document.getElementById('queryValue').setAttribute("disabled", true);
                         }
+
+                        this.queryType.addOption(filetype);
+                        this.queryType.attr("value", "Distance");
+                        var queryOperator = [];
+                        for (var i = 0; i < this.config.queryOperator.length; i++) {
+                             queryOperator[i] ={};
+                             queryOperator[i].label =this.config.queryOperator[i];
+                             queryOperator[i].value =this.config.queryOperator[i];
+                        }
+                        this.queryOperator.addOption(queryOperator);
                     }
                 }
             },
@@ -166,6 +185,7 @@ define([
                 this.selectedCustomMetrics= null;
                 this.ergGPChemicalService= null;
                 this.inputFileData= null;
+
                 if(this.outputrasterlayer != null){
                     this.map.removeLayer(this.outputrasterlayer );
                 }
@@ -196,15 +216,16 @@ define([
                 this.overlapspinner.value='';
                 
                 //this will need to change when distint values
-                //document.getElementById('queryFieldValue').setAttribute("disabled", true);
                 document.getElementById('queryValue').removeAttribute("disabled");
                 document.getElementById('queryValue').innerHTML='';
                 
                 //for now
-                dijit.byId('queryFieldName').set('disabled', true);
-                this.queryFieldName.value='';
                 this.queryValue.attr('value', '');
+                this.queryFieldValue.value = '';
                 this.overlapspinner.attr('value', '');
+
+                dijit.byId('queryFieldName').set('disabled', false);
+                dijit.byId('queryFieldValue').set('disabled', false);
 
                 if(value == 'Presence'){
                     for (var i = 0; i < this.config.queryOperatorPresence.length; i++) {
@@ -212,20 +233,32 @@ define([
                          queryOperator[i].label =this.config.queryOperatorPresence[i];
                          queryOperator[i].value =this.config.queryOperatorPresence[i];
                     }
-                    //document.getElementById('queryFieldValue').setAttribute("disabled", false);
                     document.getElementById('queryValue').setAttribute("disabled", true);
                     document.getElementById('queryValueText').innerHTML = '';
                     document.getElementById('overlapspinner').removeAttribute("disabled");
                 }
                 else if(value == 'Count'){
+                    var queryOperator = [];
+                    for (var i = 0; i < this.config.queryOperator.length; i++) {
+                         queryOperator[i] ={};
+                         queryOperator[i].label =this.config.queryOperator[i];
+                         queryOperator[i].value =this.config.queryOperator[i];
+                    }
                     document.getElementById('queryValueText').innerHTML = 'Count';
                     dijit.byId('queryFieldName').set('disabled', false);
+                    dijit.byId('queryFieldValue').set('disabled', true);
                 }
                 else if(value == 'Overlap'){
                     document.getElementById('overlapspinner').removeAttribute("disabled");
                     this.overlapspinner.value = '';
-                    //document.getElementById('queryFieldValue').setAttribute("disabled", false);
-                    if(this.config.layeroptions[this.queryLayer.value].GeoType == 'Polygon')
+                    var queryOperator = [];
+                    for (var i = 0; i < this.config.queryOperator.length; i++) {
+                         queryOperator[i] ={};
+                         queryOperator[i].label =this.config.queryOperator[i];
+                         queryOperator[i].value =this.config.queryOperator[i];
+                    }
+
+                    if(this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].GeoType == 'Polygon')
                     {
                         document.getElementById('queryValueText').innerHTML = 'Area in (km2)';
                     }
@@ -245,6 +278,8 @@ define([
                     
                     dijit.byId('queryFieldName').set('disabled', true);
                     this.queryFieldName.value = '';
+                    dijit.byId('queryFieldValue').set('disabled', true);
+                    this.queryFieldValue.value = '';
                 }
 
                 this.queryOperator.addOption(queryOperator);
@@ -289,6 +324,7 @@ define([
 
                 if (jobInfo.jobStatus !== "esriJobFailed") {
                     this.ergGPJobID = jobInfo.jobId;
+
                     this.ergGPChemicalService.getResultData(jobInfo.jobId, "OutputURL",
                             lang.hitch(this, this.addDownloadOption));
                     this.ergGPChemicalService.getResultImageLayer(jobInfo.jobId, "OutputRaster",null,
@@ -330,10 +366,6 @@ define([
                 dialog.show();
             },
 
-            convertTime: function (unix_timestamp) {
-
-            },
-
             addGraphic: function (evt) {
                 //deactivate the toolbar and clear existing graphics
                 //this.drawToolbar.deactivate();
@@ -349,13 +381,15 @@ define([
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
 
-                this.incidentGraphic = '';
-
+                this.incidentGraphic = '[';
                 for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
 
                     this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
                     if(i<this.spillGraphicsLayer.graphics.length-1){
-                        this.incidentGraphic += ";";
+                        this.incidentGraphic += "|";
+                    }
+                    else{
+                        this.incidentGraphic += ']';
                     }
                 }
             },
@@ -364,7 +398,9 @@ define([
                 if (evt.target.id === "drawSpillInfo") {
                     return;
                 }
+
                 var tool = evt.target.id.toLowerCase();
+                
                 this.map.disableMapNavigation();
                 this.spillGraphicsLayer.clear();
                 this.drawToolbar.activate(tool);
@@ -376,13 +412,12 @@ define([
                     alert('Please Select a Query Name.');
                 }
                 else{
-                    //for now
-                    //this will need to change when distint values
-                    if(this.queryType.value!='Count'){
+                    if(this.queryType.value=='Distance'||this.queryFieldName.value=="No Field"){
                         this.queryFieldName.value = '';
+                        this.queryFieldValue.value = '';
                     }
 
-                    if(this.queryType.value!='Overlap'&&this.queryType.value!='Presence'){
+                    else if(this.queryType.value!='Overlap'&&this.queryType.value!='Presence'){
                         this.overlapspinner.displayedValue = '';
                     }
                     else{
@@ -390,13 +425,38 @@ define([
                             this.overlapspinner.displayedValue=0;
                         }
                     }
+                    if(this.queryType.value=='Count'){
+                        this.queryFieldValue.value = '';
+                    }
                     if(this.queryType.value=='Presence'){
                         this.queryValue.displayedValue = '';
                         this.queryValue.value = '';
                     }
 
-                    this.queryFieldValue.value ='';
-                    this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+this.queryLayer.value+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});    
+
+                    //Alert type check and validator 
+                    var addquery = true;
+                    if(this.queryType.value=='Distance'&&this.queryValue.displayedValue ==''){
+                        addquery = false;
+                        alert("Please Fill in display value fields for Query Type Distance.");
+                    }
+                    if(this.queryType.value=='Count'&&(this.queryValue.displayedValue ==''||this.queryFieldName.value =='')){
+                        addquery = false;
+                        alert("Please Fill in all enabled fields for Query Type Count.");
+                    }
+                    if(this.queryType.value=='Presence'&&this.overlapspinner.displayedValue == ''){
+                        addquery = false;
+                        alert("Please Fill in Overlap fields for Query Type Presence.");
+                    }
+                    if(this.queryType.value=='Overlap'&&(this.overlapspinner.displayedValue == ''||this.queryValue.displayedValue =='')){
+                        addquery = false;
+                        alert("Please Fill in all enabled fields for Query Type Overlap.");
+                    }
+
+
+                    if(addquery == true){
+                        this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+dijit.byId('queryLayer').attr('displayedValue')+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});        
+                    }
                 }
             },
 
@@ -429,14 +489,13 @@ define([
                     }
 
                     params['Query_Type'] = 'Custom';
-                    //params['Query_Input'] = 'Query1,Dolphins,Count,>,1,Count_,,,';
-                    //params['Query_Input'] ="Query1,Dolphins,Count,>,10,Count_,,,; Query2, Dredged Areas,Overlap,<,5,,,25,; Query3, Shoreline, Distance,<,10000,,,,"
                     params['Query_Input'] =this.selectedCustomMetrics;
                     params['Cell_Size'] = this.winDirSpinner.value;
-                    //domAttr.addAttr("runbut", "disabled");
+                    
                     domStyle.set("loadingrunscreen", {
                         "display": 'inherit',
-                      });
+                    });
+                    
                     this.maploading = new LoadingIndicator();
                     var t = document.getElementById("loadingrunscreen");
                     this.maploading.placeAt(t);
@@ -496,26 +555,35 @@ define([
                 
                 //Get Chemical names from the GP Service
                 this.ergGPChemicalService = new Geoprocessor(this.config.url);
+                if(this.config.token != ''){
+                    this.ergGPChemicalService.token = this.config.token;
+                }
 
                 //stressors
                 var layerOption = [];
                 for (var i = 0; i < this.config.layers.length; i++) {
                     layerOption[i] ={};
-                    layerOption[i].label =this.config.layers[i];
-                    layerOption[i].value =this.config.layers[i];
+                    layerOption[i].label =this.config.layers[i].label;
+                    layerOption[i].value =this.config.layers[i].value;
 
                     if(i==0){
+                        //start with polygon
                         var queryFieldChoices = [];
-                        for (var tt = 0; tt < this.config.layeroptions[this.config.layers[i]].Fields.length; tt++) {
+                        for (var tt = 0; tt < this.config.layeroptions[this.config.layers[i].label].Fields.length; tt++) {
                             queryFieldChoices[tt] ={};
-                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i]].Fields[tt];
-                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i]].Fields[tt];
+                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i].label].Fields[tt];
+                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i].label].Fields[tt];
                         }
+                        queryFieldChoices[tt+1] ={};
+                        queryFieldChoices[tt+1].label = 'No Field';
+                        queryFieldChoices[tt+1].value = 'No Field';
 
                         this.queryFieldName.addOption(queryFieldChoices);
                         this.own(on(this.queryFieldName, "change", lang.hitch(this, this.onChangequeryFieldName)));
+                        
                         //FOR NOW to begin
                         dijit.byId('queryFieldName').set('disabled', true);
+                        dijit.byId('queryFieldValue').set('disabled', true);
                         document.getElementById('overlapspinner').setAttribute("disabled", true);
                     }
                 }
@@ -636,9 +704,6 @@ define([
                     case 'polygon':
                         f.setSymbol(this._getFillSymbol());
                         break;
-                    case 'polyline':
-                        f.setSymbol(this._getLineSymbol());
-                        break;
                     default:
                         f.setSymbol(this._getMarkerSymbol());
                         break;
@@ -744,9 +809,6 @@ define([
                     case 'extent':
                     case 'polygon':
                         g.setSymbol(this._getHightLightFillSymbol());
-                        break;
-                    case 'polyline':
-                        g.setSymbol(this._getHightLightLineSymbol());
                         break;
                     default:
                         g.setSymbol(this._getHightLightMarkerSymbol());

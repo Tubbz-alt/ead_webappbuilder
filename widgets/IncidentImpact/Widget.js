@@ -14,7 +14,6 @@ define([
     "esri/geometry/Point",
     "esri/symbols/SimpleMarkerSymbol",
     "dojo/dom-attr",
-    "esri/geometry/Polyline",
     "esri/symbols/SimpleLineSymbol",
     "esri/geometry/Polygon",
     "esri/symbols/SimpleFillSymbol",
@@ -44,10 +43,8 @@ define([
     "dojox/grid/DataGrid",
     "dojo/dom-construct"
 ],
-    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, domAttr, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query,CsvStore,DataGrid, domConstruct) {
+    function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, LoadingIndicator, utils, esriConfig, urlUtils, Geoprocessor, FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, domAttr, SimpleLineSymbol, Polygon, SimpleFillSymbol, Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, Select, CheckedMultiSelect,TextBox, jsonUtils, array, html, FeatureLayer, DrawBox, query,CsvStore,DataGrid, domConstruct) {
         return declare([BaseWidget, _WidgetsInTemplateMixin], {
-            // DemoWidget code goes here
-
             //please note that this property is be set by the framework when widget is loaded.
             //templateString: template,
 
@@ -163,9 +160,6 @@ define([
                     }
                 }
             },
-            onChangequeryType: function (newValue) {
-                
-            },
             
             onClearBtnClicked: function () {
                 if(this.spillGraphicsLayer != null){
@@ -205,7 +199,7 @@ define([
 
             //asynchronous job completed successfully
             displayERGServiceResults: function (results) {
-
+                var that = this;
                 if (results.paramName === "Output") {
                     var urlcsv;
                     if(this.config.proxy != ''){
@@ -216,17 +210,26 @@ define([
                     }
                     window.open(results.value,"_blank");
 
-                    var recordsStoreForGrid= new dojox.data.CsvStore({url: urlcsv});
+                    function completed(items, findResult){
+                      
+                        var listoffields = [];
+                        for(var i = 0; i < items[0]._csvStore._attributes.length; i++){
+                            listoffields.push({ field: items[0]._csvStore._attributes[i], name: items[0]._csvStore._attributes[i], width: 10 });
+                        }
+                        var layoutheaders=[];
+                        layoutheaders[0]= listoffields;
 
-                    var layoutheaders = [
-                        [
-                          { field: "Analysis", name: "Analysis", width: 10 },
-                          { field: "Metric", name: "Metric", width: 10 },
-                          { field: "CustomFootprint1", name: "CustomFootprint1", width: 'auto' }
-                       ]
-                    ];
-                    dijit.byId("grid").setStructure(layoutheaders);
-                    dijit.byId("grid").setStore(recordsStoreForGrid, {});
+                        dijit.byId("grid2").setStructure(layoutheaders);
+                        dijit.byId("grid2").setStore(recordsStoreForGrid, {});
+                        dijit.byId("grid2").startup();
+                    }
+                    function error(errData, request){
+                      alert("Failed to retrieve data.");
+                    }
+
+                    var sortAttributes = [{attribute: "Analysis", descending: true}];
+                    var recordsStoreForGrid= new dojox.data.CsvStore({url: urlcsv});
+                    recordsStoreForGrid.fetch({onComplete: completed, onError: error, sort: sortAttributes});
                 }
                 domStyle.set("loadingrun", {
                     "display": 'none',
@@ -235,6 +238,9 @@ define([
 
             onERGGPComplete: function (jobInfo) {
 
+                //change to the results tab
+                this.tabContainer.selectTab("Results");
+
                 if (jobInfo.jobStatus !== "esriJobFailed") {
                     this.ergGPJobID = jobInfo.jobId;
                     this.ergGPChemicalService.getResultData(jobInfo.jobId, "Output",
@@ -242,7 +248,7 @@ define([
                 }
                 else{
                     alert('Job Failed, Please try again');
-                    domStyle.set("loadingrunscreen", {
+                    domStyle.set("loadingrun", {
                         "display": 'none',
                     });
                 }
@@ -294,13 +300,18 @@ define([
                         new Color([123, 205, 232, 0.5]));
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
-                this.incidentGraphic = '';
 
+                //this.incidentGraphic = this.spillGraphicsLayer.graphics.toJson();
+
+                this.incidentGraphic = '[';
                 for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
 
                     this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
                     if(i<this.spillGraphicsLayer.graphics.length-1){
-                        this.incidentGraphic += ";";
+                        this.incidentGraphic += "|";
+                    }
+                    else{
+                        this.incidentGraphic += ']';
                     }
                 }
             },
@@ -318,18 +329,6 @@ define([
             onSolve: function (evt) {
                 this.drawToolbar.deactivate();
                 var params = {};
-
-                var recordsStoreForGrid= new dojox.data.CsvStore({url: "Summary.csv"});
-
-                var layoutheaders = [
-                    [
-                      { field: "Analysis", name: "Analysis", width: 10 },
-                      { field: "Metric", name: "Metric", width: 10 },
-                      { field: "CustomFootprint1", name: "CustomFootprint1", width: 'auto' }
-                   ]
-                ];
-                dijit.byId("grid").setStructure(layoutheaders);
-                dijit.byId("grid").setStore(recordsStoreForGrid, {});
 
                 if(this.incidentGraphic == null && this.inputFileData == null){
                     alert("Please add polygon geometry input or upload a file.");
@@ -450,6 +449,9 @@ define([
                 
                 //Get Chemical names from the GP Service
                 this.ergGPChemicalService = new Geoprocessor(this.config.url);
+                if(this.config.token != ''){
+                    this.ergGPChemicalService.token = this.config.token;
+                }
 
                 //stressors
                 var stressorOption = [];
@@ -594,12 +596,8 @@ define([
 
             _setFeatureSymbol: function (f) {
                 switch (f.geometry.type) {
-                    case 'extent':
                     case 'polygon':
                         f.setSymbol(this._getFillSymbol());
-                        break;
-                    case 'polyline':
-                        f.setSymbol(this._getLineSymbol());
                         break;
                     default:
                         f.setSymbol(this._getMarkerSymbol());
@@ -703,25 +701,21 @@ define([
 
             _setHightLightSymbol:function(g){
                 switch(g.geometry.type){
-                    case 'extent':
                     case 'polygon':
                         g.setSymbol(this._getHightLightFillSymbol());
-                        break;
-                    case 'polyline':
-                        g.setSymbol(this._getHightLightLineSymbol());
                         break;
                     default:
                         g.setSymbol(this._getHightLightMarkerSymbol());
                         break;
                 }
             },
-
             
             _parseUrl: function (url) {
                 var location = document.createElement("a");
                 location.href = url;
                 return location;                    
             },
+            
             _itemExists: function (searchItem, list) {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] === searchItem) {

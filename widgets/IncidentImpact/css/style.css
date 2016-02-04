@@ -1,3 +1,7 @@
+@import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojox/grid/resources/Grid.css";
+/*@import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojox/grid/resources/claroGrid.css";
+*/
+.dojoxGrid table { margin: 0; }
 .jimu-widget-erg{
     margin: -14px -14px 10px -14px;
 }
@@ -19,13 +23,13 @@
     text-align:center;
 }
 .dijitReset .dijitButtonContents{
-    background-color: grey !important;
+    background-color: gray !important;
 }
 .dijitReset .dijitMenuItemLabel{
-    background-color: grey !important;
+    background-color: gray !important;
 }
 .dijitReset .dijitMenuItemIconCell{
-    background-color: grey !important;
+    background-color: gray !important;
 }
 .uploadHover{
     background-image:url('../images/top.png');
