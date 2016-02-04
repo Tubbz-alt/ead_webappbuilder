@@ -91,8 +91,8 @@ define([
 
                         for (var i = 0; i < features.length; i++) {
                             queryvalueChoices[i] ={};
-                            queryvalueChoices[i].label =features[i];
-                            queryvalueChoices[i].value =features[i];
+                            queryvalueChoices[i].label =String(features[i]);
+                            queryvalueChoices[i].value =String(features[i]);
                         }
                         that.queryFieldValue.set('options',[]);
                         that.queryFieldValue._updateSelection();
@@ -115,9 +115,18 @@ define([
                         
                         var queryFieldChoices = [];
                         for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
-                            queryFieldChoices[i] ={};
-                            queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i];
-                            queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i];
+                            if(this.queryType.value=='Count'){
+                                if(this.config.layeroptions[prop].Fields[i][1]=="1"){
+                                    queryFieldChoices[i] ={};
+                                    queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i][0];
+                                    queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i][0];
+                                }
+                            }
+                            else{
+                                queryFieldChoices[i] ={};
+                                queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i][0];
+                                queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i][0];
+                            }
                         }
                         queryFieldChoices[i] ={};
                         queryFieldChoices[i].label = 'No Field';
@@ -247,6 +256,23 @@ define([
                     document.getElementById('queryValueText').innerHTML = 'Count';
                     dijit.byId('queryFieldName').set('disabled', false);
                     dijit.byId('queryFieldValue').set('disabled', true);
+
+                    //remove number fields
+                    this.queryFieldName.set('options',[]);
+                    var queryFieldChoices = [];
+                    for (var ii = 0; ii < this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields.length; ii++) {
+                        if(this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][1]=="1"){
+
+                            queryFieldChoices[ii] ={};
+                            queryFieldChoices[ii].label =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
+                            queryFieldChoices[ii].value =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
+                        }
+                    }
+                    queryFieldChoices[ii] ={};
+                    queryFieldChoices[ii].label = 'No Field';
+                    queryFieldChoices[ii].value = 'No Field';
+
+                    this.queryFieldName.addOption(queryFieldChoices);
                 }
                 else if(value == 'Overlap'){
                     document.getElementById('overlapspinner').removeAttribute("disabled");
@@ -368,7 +394,7 @@ define([
 
             addGraphic: function (evt) {
                 //deactivate the toolbar and clear existing graphics
-                //this.drawToolbar.deactivate();
+                this.drawToolbar.deactivate();
                 this.map.enableMapNavigation();
 
                 // figure out which symbol to use
@@ -380,18 +406,7 @@ define([
                         new Color([0, 0, 255, 0.5]));
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
-
-                this.incidentGraphic = '[';
-                for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
-
-                    this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
-                    if(i<this.spillGraphicsLayer.graphics.length-1){
-                        this.incidentGraphic += "|";
-                    }
-                    else{
-                        this.incidentGraphic += ']';
-                    }
-                }
+                this.incidentGraphic = evt.geometry;
             },
 
             bindDrawToolbar: function (evt) {
@@ -438,21 +453,20 @@ define([
                     var addquery = true;
                     if(this.queryType.value=='Distance'&&this.queryValue.displayedValue ==''){
                         addquery = false;
-                        alert("Please Fill in display value fields for Query Type Distance.");
+                        alert("Please make sure all display value fields for Query Type DISTANCE are selected.");
                     }
                     if(this.queryType.value=='Count'&&(this.queryValue.displayedValue ==''||this.queryFieldName.value =='')){
                         addquery = false;
-                        alert("Please Fill in all enabled fields for Query Type Count.");
+                        alert("Please make sure all enabled fields for Query Type COUNT are selected.");
                     }
                     if(this.queryType.value=='Presence'&&this.overlapspinner.displayedValue == ''){
                         addquery = false;
-                        alert("Please Fill in Overlap fields for Query Type Presence.");
+                        alert("Please make sure all Overlap fields for Query Type PRESENCE are selected.");
                     }
                     if(this.queryType.value=='Overlap'&&(this.overlapspinner.displayedValue == ''||this.queryValue.displayedValue =='')){
                         addquery = false;
-                        alert("Please Fill in all enabled fields for Query Type Overlap.");
+                        alert("Please make sure all enabled fields for Query Type OVERLAP are selected.");
                     }
-
 
                     if(addquery == true){
                         this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+dijit.byId('queryLayer').attr('displayedValue')+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});        
@@ -571,8 +585,8 @@ define([
                         var queryFieldChoices = [];
                         for (var tt = 0; tt < this.config.layeroptions[this.config.layers[i].label].Fields.length; tt++) {
                             queryFieldChoices[tt] ={};
-                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i].label].Fields[tt];
-                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i].label].Fields[tt];
+                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
+                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
                         }
                         queryFieldChoices[tt+1] ={};
                         queryFieldChoices[tt+1].label = 'No Field';
