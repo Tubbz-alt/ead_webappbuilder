@@ -1,8 +1,8 @@
 {
-  "proxy":"",
+  "proxy":"bk0sEmU_sj6RYIOY7njHLDPV8ukA3zUojQiMRxIPODvGOcKhrY0QC1ST3q3Cuy9v_P7IiL6IiqkctIgXzq7CqQ..",
   "proxyprefix":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services",
   "token":"",
-  "url":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3",
+  "url":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3?token=bk0sEmU_sj6RYIOY7njHLDPV8ukA3zUojQiMRxIPODvGOcKhrY0QC1ST3q3Cuy9v_P7IiL6IiqkctIgXzq7CqQ..",
   "url_upload":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/uploads/upload",
   "habitats": [
       "Mudflats",

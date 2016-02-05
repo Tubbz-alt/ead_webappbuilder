@@ -139,6 +139,9 @@ define([
             onSolve: function(){
 
                 this.eadlayer = new ArcGISDynamicMapServiceLayer(this.config.StressorURL, {id:"ead_stressor"});
+                if(this.params.config.token != ''){
+                    this.eadlayer.token = this.params.config.token;
+                }
                 this.map.addLayer(this.eadlayer);
                 //var t = WidgetManager.getInstance().getAllWidgets();
                 //WidgetManager.getInstance().loadWidget(t);
