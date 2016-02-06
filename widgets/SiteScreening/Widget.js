@@ -68,10 +68,13 @@ define([
                   var qTask = new QueryTask(this.config.dataurl+'/'+this.queryLayer.value);
                   
                   if(this.config.token != ''){
-                    qTask.token = this.config.token;
+                        var qTask = new QueryTask(this.config.dataurl+'/'+this.queryLayer.value+"?token="+this.config.token);
+                  }
+                  else{
+                        var qTask = new QueryTask(this.config.dataurl+'/'+this.queryLayer.value);
                   }
                   
-                  filterquery = new Query();
+                  var filterquery = new Query();
                   filterquery.where = "1=1";
                   filterquery.outFields = [newValue];
                   filterquery.returnDistinctValues=true;
