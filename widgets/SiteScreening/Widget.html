@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div data-dojo-attach-point="tabNode2" class="ergTabs">
+                <div data-dojo-attach-point="tabNode2" class="ergTabs" style="font-size:17px">
                     <div data-dojo-attach-point="progressBar" data-dojo-type="dijit/ProgressBar" data-dojo-props='indeterminate:true' style="display:none;"></div>
                     
                     <div class="noresults-section" data-dojo-attach-point="noresultsSection">
@@ -64,10 +64,12 @@
                     </form>
                     <br>
                     <br>
+                    <label style='padding-left:139px;font-size:21px;'>Or Choose</label> 
+                    <br><br>
                     <br>
-                    <label>Shapefile Type</label> <br>
-                        <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="shpType"
-                                data-dojo-type="dijit/form/Select"></select>
+                    <label>Layer from the EAD Database Below</label> <br>
+                    <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="shpType"
+                            data-dojo-type="dijit/form/Select"></select>
                 </div>
 
                 <div data-dojo-attach-point="tabNode3" class="ergTabs">
@@ -96,6 +98,8 @@
                             <br><label id='queryValueText'>Value</label>
                             <input class="ergControls"  data-dojo-attach-point="queryValue" id='queryValue'
                             class="ergControls" value=""
+                                data-dojo-props="
+                                constraints:{min:0,max:202000000,places:0,pattern:'#'}"
                                 data-dojo-type="dijit/form/NumberTextBox"></input></select>
                         </div>
                         <div>
@@ -104,7 +108,7 @@
                                 <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldName" id='queryFieldName' data-dojo-type="dijit/form/Select"></select>
                             </div>
                             <div style='display: block;width: 163px;float: right;'>
-                                <br><label>Field Value</label>
+                                <br><label id='fieldvaluelab'>Field Value</label>
                                 <select class="ergControls" data-dojo-props="maxHeight: 200"  data-dojo-attach-point="queryFieldValue" id='queryFieldValue' data-dojo-type="dijit/form/Select"></select>
                             </div>
                         </div>
@@ -112,6 +116,8 @@
                         <div>
                         <label>Overlap Cell Size in Meters </label> <br>
                         <input data-dojo-type="dijit/form/NumberTextBox"
+                        data-dojo-props="
+                                constraints:{min:0,max:202000000,places:0,pattern:'#'}"
                                data-dojo-attach-point="overlapspinner"
                                class="ergControls" value="" id='overlapspinner'/>
                         </div>

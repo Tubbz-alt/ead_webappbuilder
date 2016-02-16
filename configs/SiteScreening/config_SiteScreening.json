@@ -4,7 +4,7 @@
   "proxyprefix":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services",
   "token":"bk0sEmU_sj6RYIOY7njHLDPV8ukA3zUojQiMRxIPODvGOcKhrY0QC1ST3q3Cuy9v_P7IiL6IiqkctIgXzq7CqQ..",
   "url":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/SiteScreening2/GPServer/Site%20Screening%20v2?token=bk0sEmU_sj6RYIOY7njHLDPV8ukA3zUojQiMRxIPODvGOcKhrY0QC1ST3q3Cuy9v_P7IiL6IiqkctIgXzq7CqQ..",
-  "url_upload":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/SiteScreening2/GPServer/uploads/upload",
+  "url_upload":"http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/SiteScreening2/GPServer/uploads/upload?token=bk0sEmU_sj6RYIOY7njHLDPV8ukA3zUojQiMRxIPODvGOcKhrY0QC1ST3q3Cuy9v_P7IiL6IiqkctIgXzq7CqQ..",
   "queryTypePoint": [
   {"label":"Distance","value":"Distance"},
   {"label":"Count","value":"Count"},
@@ -14,7 +14,7 @@
   {"label":"Overlap","value":"Overlap"},
   {"label":"Presence","value":"Presence"}],
   "queryOperator": ["=",">=","<=","<",">"],
-  "queryOperatorPresence": ["true","false"],
+  "queryOperatorPresence": ["TRUE","FALSE"],
   "layers": [{"label":"Abu Dhabi Boundary","value":"31"},
        {"label":"Abu Dhabi Territorial Waters","value":"33"},
         {"label":"Emirates","value":"32"},
@@ -51,7 +51,7 @@
     ],
   "filetype": [
           "Shapefile",
-          "Model Output"
+          "Layer"
         ],
   "layeroptions":
   {

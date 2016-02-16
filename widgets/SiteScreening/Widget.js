@@ -47,7 +47,6 @@ define([
             baseClass: 'jimu-widget-erg',
             name: 'SCREENING',
             spillGraphicsLayer: null,
-            ergGraphicsLayer: null,
             selectedMaterialType: null,
             selectedCustomMetrics:null,
             ergGPChemicalService: null,
@@ -81,6 +80,7 @@ define([
 
                   filterquery.returnGeometry = false;
 
+                  document.getElementById('fieldvaluelab').innerHTML = '..Loading Fields';
                   // execute the query
                   qTask.execute(filterquery).then(function (featureSet) {
                         var features, i;
@@ -91,15 +91,19 @@ define([
                         // sort the list
                         features.sort();
                         var queryvalueChoices = [];
+                        queryvalueChoices[0] ={};
+                        queryvalueChoices[0].label ="No Value";
+                        queryvalueChoices[0].value ="No Value";
 
                         for (var i = 0; i < features.length; i++) {
-                            queryvalueChoices[i] ={};
-                            queryvalueChoices[i].label =String(features[i]);
-                            queryvalueChoices[i].value =String(features[i]);
+                            queryvalueChoices[i+1] ={};
+                            queryvalueChoices[i+1].label =String(features[i]);
+                            queryvalueChoices[i+1].value =String(features[i]);
                         }
                         that.queryFieldValue.set('options',[]);
                         that.queryFieldValue._updateSelection();
                         that.queryFieldValue.addOption(queryvalueChoices);
+                        document.getElementById('fieldvaluelab').innerHTML = 'Field Value';
                   });
               }
               
@@ -117,23 +121,23 @@ define([
                     if(dijit.byId('queryLayer').attr('displayedValue') == prop){
                         
                         var queryFieldChoices = [];
+                        queryFieldChoices[0] ={};
+                        queryFieldChoices[0].label = 'No Field';
+                        queryFieldChoices[0].value = 'No Field';
                         for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
                             if(this.queryType.value=='Count'){
                                 if(this.config.layeroptions[prop].Fields[i][1]=="1"){
-                                    queryFieldChoices[i] ={};
-                                    queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i][0];
-                                    queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i][0];
+                                    queryFieldChoices[i+1] ={};
+                                    queryFieldChoices[i+1].label =this.config.layeroptions[prop].Fields[i][0];
+                                    queryFieldChoices[i+1].value =this.config.layeroptions[prop].Fields[i][0];
                                 }
                             }
                             else{
-                                queryFieldChoices[i] ={};
-                                queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i][0];
-                                queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i][0];
+                                queryFieldChoices[i+1] ={};
+                                queryFieldChoices[i+1].label =this.config.layeroptions[prop].Fields[i][0];
+                                queryFieldChoices[i+1].value =this.config.layeroptions[prop].Fields[i][0];
                             }
                         }
-                        queryFieldChoices[i] ={};
-                        queryFieldChoices[i].label = 'No Field';
-                        queryFieldChoices[i].value = 'No Field';
 
                         this.queryFieldName.addOption(queryFieldChoices);
 
@@ -195,8 +199,8 @@ define([
                 this.spillGraphicsLayer.clear();
                 this.selectedMaterialType= null;
                 this.selectedCustomMetrics= null;
-                this.ergGPChemicalService= null;
                 this.inputFileData= null;
+                this.queryName.value= null;
 
                 if(this.outputrasterlayer != null){
                     this.map.removeLayer(this.outputrasterlayer );
@@ -263,17 +267,17 @@ define([
                     //remove number fields
                     this.queryFieldName.set('options',[]);
                     var queryFieldChoices = [];
-                    for (var ii = 0; ii < this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields.length; ii++) {
-                        if(this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][1]=="1"){
-
-                            queryFieldChoices[ii] ={};
-                            queryFieldChoices[ii].label =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
-                            queryFieldChoices[ii].value =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
-                        }
-                    }
                     queryFieldChoices[ii] ={};
                     queryFieldChoices[ii].label = 'No Field';
                     queryFieldChoices[ii].value = 'No Field';
+                    for (var ii = 0; ii < this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields.length; ii++) {
+                        if(this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][1]=="1"){
+
+                            queryFieldChoices[ii+1] ={};
+                            queryFieldChoices[ii+1].label =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
+                            queryFieldChoices[ii+1].value =this.config.layeroptions[dijit.byId('queryLayer').attr('displayedValue')].Fields[ii][0];
+                        }
+                    }
 
                     this.queryFieldName.addOption(queryFieldChoices);
                 }
@@ -341,8 +345,12 @@ define([
                 document.getElementById("downloadfileLinkdetails").href = results.url;
                 results.name = "Output Site Screening Layer";
                 this.outputrasterlayer = results;
-
-                this.map.addLayer(results);
+                var urlwithoutoken = this.outputrasterlayer.url.split('?token')[0];
+                //if(this.config.token != ''){
+                //    this.outputrasterlayer.token = this.config.token;
+                //}
+                this.outputrasterlayer.url = urlwithoutoken;
+                this.map.addLayers([results]);
             },
 
             addDownloadOption:function(val){
@@ -356,11 +364,11 @@ define([
 
                     this.ergGPChemicalService.getResultData(jobInfo.jobId, "OutputURL",
                             lang.hitch(this, this.addDownloadOption));
-                    this.ergGPChemicalService.getResultImageLayer(jobInfo.jobId, "OutputRaster",null,
+                    this.ergGPChemicalService.getResultImageLayer(jobInfo.jobId, null,null,
                             lang.hitch(this, this.displayERGServiceResults));
                 }
                 else{
-                    alert('Job Failed, Please try again');
+                    this.showDialog('Job Failed, Please try again');
                     domStyle.set("loadingrunscreen", {
                         "display": 'none',
                     });
@@ -371,26 +379,19 @@ define([
                 var status = jobInfo.jobStatus;
             },
 
-            confirmationDialog: function (configJson) {
+            showDialog: function (configJson) {
                 var dialog = new Dialog({
-                    title: configJson.title,
-                    content: ["<div style='width:25em'>", configJson.message, "</div>"].join('')
+                    title: "Alert",
+                    content: ["<div style='font-size:17px;padding-top:30px;padding-bottom:30px;'>", configJson, "</div>"].join('')
                 });
 
-                dialog.onButtonClickEvent = function (button) {
-                    return function () {
-                        button.callBack.apply(this, []);
-                        dialog.onCancel();
-                    }
-                };
+                // dialog.onButtonClickEvent = function (button) {
+                //     return function () {
+                //         button.callBack.apply(this, []);
+                //         dialog.onCancel();
+                //     }
+                // };
 
-                for (actionButton in configJson.actionButtons) {
-                    if (configJson.actionButtons.hasOwnProperty(actionButton)) {
-                        dojo.place(new dijit.form.Button({label: configJson.actionButtons[actionButton].label,
-                            onClick: dialog.onButtonClickEvent.apply(dialog, [configJson.actionButtons[actionButton]])
-                        }).domNode, dialog.containerNode, 'after');
-                    }
-                }
                 dialog.startup();
                 dialog.show();
             },
@@ -427,7 +428,7 @@ define([
             addQuery:function(){
                 
                 if(this.queryName.displayedValue == ""){
-                    alert('Please Select a Query Name.');
+                    this.showDialog('Please Select a Query Name.');
                 }
                 else{
                     if(this.queryType.value=='Distance'||this.queryFieldName.value=="No Field"){
@@ -456,24 +457,24 @@ define([
                     var addquery = true;
                     if(this.queryType.value=='Distance'&&this.queryValue.displayedValue ==''){
                         addquery = false;
-                        alert("Please make sure all display value fields for Query Type DISTANCE are selected.");
+                        this.showDialog("Please make sure all display value fields for Query Type DISTANCE are selected.");
                     }
                     if(this.queryType.value=='Count'&&(this.queryValue.displayedValue ==''||this.queryFieldName.value =='')){
                         addquery = false;
-                        alert("Please make sure all enabled fields for Query Type COUNT are selected.");
+                        this.showDialog("Please make sure all enabled fields for Query Type COUNT are selected.");
                     }
                     if(this.queryType.value=='Presence'&&this.overlapspinner.displayedValue == ''){
                         addquery = false;
-                        alert("Please make sure all Overlap fields for Query Type PRESENCE are selected.");
+                        this.showDialog("Please make sure all Overlap fields for Query Type PRESENCE are selected.");
                     }
                     if(this.queryType.value=='Overlap'&&(this.overlapspinner.displayedValue == ''||this.queryValue.displayedValue =='')){
                         addquery = false;
-                        alert("Please make sure all enabled fields for Query Type OVERLAP are selected.");
+                        this.showDialog("Please make sure all enabled fields for Query Type OVERLAP are selected.");
                     }
 
                     if(addquery == true){
                         this.CustomMetricsSite.addOption({"label":this.queryName.displayedValue,"value":this.queryName.displayedValue+","+dijit.byId('queryLayer').attr('displayedValue')+","+this.queryType.value+","+this.queryOperator.value+","+this.queryValue.displayedValue+","+ this.queryFieldName.value+","+this.queryFieldValue.value+","+this.overlapspinner.displayedValue+","});        
-                        alert('Query '+this.queryName.displayedValue+' added to Paramter List.');
+                        this.showDialog('Query '+this.queryName.displayedValue+' added to Paramter List.');
                     }
                 }
             },
@@ -487,19 +488,24 @@ define([
 
                 var params = {};
 
-                if(this.incidentGraphic == null && this.inputFileData == null){
-                    alert("Please add polygon geometry input or upload a file.");
+                if(this.incidentGraphic == null && this.inputFileData == null && this.shpType.value == "No Layer"){
+                    this.showDialog("Please add polygon geometry input or upload a file.");
                 }
                 else if(this.scenarioName.displayedValue == ""){
-                    alert("Please Select a Scenario Name.");   
+                    this.showDialog("Please Select a Scenario Name.");   
                 }
                 else if(this.selectedCustomMetrics == null ||this.selectedCustomMetrics == ''){
-                    alert("Please Select a Query Option (s).");   
+                    this.showDialog("Please Select a Query Option (s).");   
                 }
                 else{
-                    if(this.inputFileData != null){
+                    //send in layer from list
+                    if(this.shpType.value != "No Layer"){
+                        params['AOI_Input'] = this.shpType.value;
+                        params['AOI_Input_Type'] = "Layer";
+                    }
+                    else if(this.inputFileData != null){
                         params['AOI_Input'] = this.inputFileData;
-                        params['AOI_Input_Type'] = this.inputFileDataType;
+                        params['AOI_Input_Type'] = "Shapefile";
                     }
                     else {
                         params['AOI_Input_Type'] = 'AOI';
@@ -587,14 +593,14 @@ define([
                     if(i==0){
                         //start with polygon
                         var queryFieldChoices = [];
+                        queryFieldChoices[0] ={};
+                        queryFieldChoices[0].label = 'No Field';
+                        queryFieldChoices[0].value = 'No Field';
                         for (var tt = 0; tt < this.config.layeroptions[this.config.layers[i].label].Fields.length; tt++) {
-                            queryFieldChoices[tt] ={};
-                            queryFieldChoices[tt].label =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
-                            queryFieldChoices[tt].value =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
+                            queryFieldChoices[tt+1] ={};
+                            queryFieldChoices[tt+1].label =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
+                            queryFieldChoices[tt+1].value =this.config.layeroptions[this.config.layers[i].label].Fields[tt][0];
                         }
-                        queryFieldChoices[tt+1] ={};
-                        queryFieldChoices[tt+1].label = 'No Field';
-                        queryFieldChoices[tt+1].value = 'No Field';
 
                         this.queryFieldName.addOption(queryFieldChoices);
                         this.own(on(this.queryFieldName, "change", lang.hitch(this, this.onChangequeryFieldName)));
@@ -633,13 +639,21 @@ define([
                 this.own(on(this.queryName, "change", lang.hitch(this, this.queryNameChange)));
 
                 var filetype = [];
-                for (var i = 0; i < this.config.filetype.length; i++) {
-                    filetype[i] ={};
-                    filetype[i].label =this.config.filetype[i];
-                    filetype[i].value =this.config.filetype[i];
+                var filetypenum = 1;
+                filetype[0] ={};
+                filetype[0].label ="No Layer";
+                filetype[0].value ="No Layer";
+
+                for (var layerNam in this.config.layeroptions) { 
+                    if(this.config.layeroptions[layerNam].GeoType == 'Polygon'){
+                        filetype[filetypenum] ={};
+                        filetype[filetypenum].label =layerNam;
+                        filetype[filetypenum].value =layerNam;
+                        filetypenum++;
+                    }
                 }
                 this.shpType.addOption(filetype);
-                this.own(on(this.shpType, "change", lang.hitch(this, this.onChangefiletype)));
+                //this.own(on(this.shpType, "change", lang.hitch(this, this.onChangefiletype)));
                 
                 var CustomMetricsChoices = [];
                 for (var i = 0; i < this.config.custom.length; i++) {
@@ -672,21 +686,17 @@ define([
                     });  
                       
                     function uploadFailed(response) {                                                                                                                                                                                                                                                             
-                      alert(response.message);
+                      this.showDialog(response.message);
                     }  
                     function uploadSucceeded(response,io) {                                                                                                                                                                                                                                                             
-                      that.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      //that.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      that.inputFileData = response["item"].itemID+"\\"+response["item"].itemName ;  
                     }
                 };
 
                 //spill location graphics layer
                 this.spillGraphicsLayer = new GraphicsLayer();
                 this.map.addLayer(this.spillGraphicsLayer);
-
-                //ERG coverage layer
-                this.ergGraphicsLayer = new GraphicsLayer();
-                this.map.addLayer(this.ergGraphicsLayer);
-
 
                 this.drawToolbar = new Draw(this.map);
                 this.own(on(this.drawToolbar, "draw-end", lang.hitch(this, this.addGraphic)));

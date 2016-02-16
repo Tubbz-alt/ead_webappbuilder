@@ -103,15 +103,21 @@ define([
             onChangeCustomMetrics: function (newValue) {
                 //multivalues
                 var stringvalue = '';
-                for (var i = 0; i < newValue.length; i++) {
-                    if(i>0){
-                       stringvalue+=';';
-                    }
-                    if(newValue[i]!="None"){
-                        stringvalue+=newValue[i].replace(' - ',',');
-                    }
+                if( newValue.toString().search('None')>-1){
+                    this.selectedCustomMetrics = '';
+                    stringvalue = "No Custom Settings";
                 }
-                this.selectedCustomMetrics = stringvalue;
+                else{
+                    for (var i = 0; i < newValue.length; i++) {
+                        if(i>0){
+                           stringvalue+=';';
+                        }
+                        if(newValue[i]!="None"){
+                            stringvalue+=newValue[i].replace(' - ',',');
+                        }
+                    }
+                    this.selectedCustomMetrics = stringvalue;
+                }
                 document.getElementById("customvalue").innerHTML = stringvalue;
             },
 
@@ -150,10 +156,13 @@ define([
                         }
 
                         var queryFieldChoices = [];
+                        queryFieldChoices[0] ={};
+                        queryFieldChoices[0].label ="No Field";
+                        queryFieldChoices[0].value ="No Field";
                         for (var i = 0; i < this.config.layeroptions[prop].Fields.length; i++) {
-                            queryFieldChoices[i] ={};
-                            queryFieldChoices[i].label =this.config.layeroptions[prop].Fields[i];
-                            queryFieldChoices[i].value =this.config.layeroptions[prop].Fields[i];
+                            queryFieldChoices[i+1] ={};
+                            queryFieldChoices[i+1].label =this.config.layeroptions[prop].Fields[i];
+                            queryFieldChoices[i+1].value =this.config.layeroptions[prop].Fields[i];
                         }
 
                         this.metricField.addOption(queryFieldChoices);
@@ -166,7 +175,7 @@ define([
                     this.spillGraphicsLayer.clear();
                 }
                 var newStore = new dojo.data.ItemFileReadStore({data: {  identifier: "",  items: []}});   
-                dijit.byId("grid").setStore(newStore, {}); 
+                dijit.byId("grid2").setStore(newStore, {}); 
 
                 this.obs.set('value',[]);
                 this.obs._updateSelection();
@@ -190,11 +199,19 @@ define([
 
             addMatric:function(){
                 if(this.matricName.displayedValue != ""){
-                    this.CustomMetrics.addOption({"label":this.matricName.displayedValue,"value":this.metricLayer.value+","+this.metricType.value+","+this.metricField.value});    
-                    alert('Metric '+this.matricName.displayedValue+' added to Paramter List.');
+                    if(this.metricField.value == "No Field"){
+                        this.CustomMetrics.addOption({"label":this.matricName.displayedValue,"value":this.metricLayer.value+","+this.metricType.value+","});        
+                    }
+                    else{
+                        this.CustomMetrics.addOption({"label":this.matricName.displayedValue,"value":this.metricLayer.value+","+this.metricType.value+","+this.metricField.value});        
+                    }
+                    
+                    this.showDialog('Metric '+this.matricName.displayedValue+' added to Paramter List.');
+
+                    this.matricName.attr('value', null);
                 }
                 else{
-                    alert('Please Select a Metric Name.');
+                    this.showDialog('Please Select a Metric Name.');
                 }
             },
 
@@ -225,7 +242,7 @@ define([
                         dijit.byId("grid2").startup();
                     }
                     function error(errData, request){
-                      alert("Failed to retrieve data.");
+                      this.showDialog("Failed to retrieve data.");
                     }
 
                     var sortAttributes = [{attribute: "Analysis", descending: true}];
@@ -248,7 +265,7 @@ define([
                             lang.hitch(this, this.displayERGServiceResults));
                 }
                 else{
-                    alert('Job Failed, Please try again');
+                    showDialog('Job Failed, Please try again');
                     domStyle.set("loadingrun", {
                         "display": 'none',
                     });
@@ -259,26 +276,12 @@ define([
                 var status = jobInfo.jobStatus;
             },
 
-            confirmationDialog: function (configJson) {
+            showDialog: function (configJson) {
                 var dialog = new Dialog({
-                    title: configJson.title,
-                    content: ["<div style='width:25em'>", configJson.message, "</div>"].join('')
+                    title: "Alert",
+                    content: ["<div style='font-size:17px;padding-top:30px;padding-bottom:30px;'>", configJson, "</div>"].join('')
                 });
 
-                dialog.onButtonClickEvent = function (button) {
-                    return function () {
-                        button.callBack.apply(this, []);
-                        dialog.onCancel();
-                    }
-                };
-
-                for (actionButton in configJson.actionButtons) {
-                    if (configJson.actionButtons.hasOwnProperty(actionButton)) {
-                        dojo.place(new dijit.form.Button({label: configJson.actionButtons[actionButton].label,
-                            onClick: dialog.onButtonClickEvent.apply(dialog, [configJson.actionButtons[actionButton]])
-                        }).domNode, dialog.containerNode, 'after');
-                    }
-                }
                 dialog.startup();
                 dialog.show();
             },
@@ -302,17 +305,26 @@ define([
                 }
                 this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
 
-                //this.incidentGraphic = this.spillGraphicsLayer.graphics.toJson();
-
                 this.incidentGraphic = '[';
+                var numofpolys = 1;
                 for (var i = 0; i < this.spillGraphicsLayer.graphics.length; i++) {
 
-                    this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
-                    if(i<this.spillGraphicsLayer.graphics.length-1){
-                        this.incidentGraphic += "|";
-                    }
-                    else{
-                        this.incidentGraphic += ']';
+                    var et = this.spillGraphicsLayer.graphics[i].geometry.getExtent();
+                    
+                    if(et != null){
+                        this.incidentGraphic += JSON.stringify(this.spillGraphicsLayer.graphics[i].geometry);
+                    
+                        //add label
+                        var schTextSymbol = new esri.symbol.TextSymbol("Custom Footprint "+ String(numofpolys));
+                        this.spillGraphicsLayer.add(new Graphic(this.spillGraphicsLayer.graphics[i].geometry.getExtent().getCenter(), schTextSymbol));
+
+                        if(i<this.spillGraphicsLayer.graphics.length-3){
+                            this.incidentGraphic += "|";
+                        }
+                        else{
+                            this.incidentGraphic += ']';
+                        }
+                        numofpolys++;
                     }
                 }
             },
@@ -332,26 +344,21 @@ define([
                 var params = {};
 
                 if(this.incidentGraphic == null && this.inputFileData == null){
-                    alert("Please add polygon geometry input or upload a file.");
+                    this.showDialog("Please add polygon geometry input or upload a file.");
                 }
                 else{
                     if(this.inputFileData != null){
-                        params['Input '] = this.inputFileData;
-                        params['InputType'] = this.inputFileDataType;
+                        params['Input'] = this.inputFileData;
+                        params['InputType'] = this.shpType_site.value;
                     }
                     else {
                         params['InputType'] = 'AOI';
                         params['Input'] = this.incidentGraphic;
                     }
                     var oneValueSelected = false;
-                    if(this.selectedCustomMetrics != null){
-                        if( this.selectedCustomMetrics != 'None'){
-                            params['CustomMetrics'] =this.selectedCustomMetrics;   
-                            oneValueSelected=true; 
-                        } 
-                        else{
-                            params['CustomMetrics'] = '';
-                        }      
+                    if(this.selectedCustomMetrics != null&&this.selectedCustomMetrics != ''){
+                        params['CustomMetrics'] =this.selectedCustomMetrics;   
+                        oneValueSelected=true;      
                     }
                     else{
                         params['CustomMetrics'] = '';
@@ -378,7 +385,7 @@ define([
                         params['Observations'] = '';
                     }
                     if(oneValueSelected == false){
-                        alert("Please Select at least one parameter for the model.");
+                        this.showDialog("Please Select at least one parameter for the model.");
                     }
                     else{
                         //domAttr.addAttr("runbut", "disabled");
@@ -481,7 +488,7 @@ define([
                     filetype[i].value =this.config.filetype[i];
                 }
                 this.shpType_site.addOption(filetype);
-                this.own(on(this.shpType_site, "change", lang.hitch(this, this.onChangefiletype)));
+                //this.own(on(this.shpType_site, "change", lang.hitch(this, this.onChangefiletype)));
 
                 var habitatsOption = [];
                 for (var i = 0; i < this.config.habitats.length; i++) {
@@ -509,10 +516,13 @@ define([
                     queryLayerChoices[i].value =prop;
                     if(i==0){
                         var queryFieldChoices = [];
+                        queryFieldChoices[0] ={};
+                        queryFieldChoices[0].label ="No Field";
+                        queryFieldChoices[0].value ="No Field";
                         for (var t = 0; t < this.config.layeroptions[prop].Fields.length; t++) {
-                            queryFieldChoices[t] ={};
-                            queryFieldChoices[t].label =this.config.layeroptions[prop].Fields[t];
-                            queryFieldChoices[t].value =this.config.layeroptions[prop].Fields[t];
+                            queryFieldChoices[t+1] ={};
+                            queryFieldChoices[t+1].label =this.config.layeroptions[prop].Fields[t];
+                            queryFieldChoices[t+1].value =this.config.layeroptions[prop].Fields[t];
                         }
 
                         this.metricField.addOption(queryFieldChoices);
@@ -553,20 +563,17 @@ define([
                     });  
                       
                     function uploadFailed(response) {                                                                                                                                                                                                                                                             
-                      alert(response.message);
+                      this.showDialog(response.message);
                     }  
                     function uploadSucceeded(response,io) {                                                                                                                                                                                                                                                             
-                      that.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      //that.inputFileData = {'Input_Rows': "{'itemID':" +response["item"].itemID+ "}" };  
+                      that.inputFileData = response["item"].itemID+"\\"+response["item"].itemName ;  
                     }  
                 };
 
                 //spill location graphics layer
                 this.spillGraphicsLayer = new GraphicsLayer();
                 this.map.addLayer(this.spillGraphicsLayer);
-
-                //ERG coverage layer
-                this.ergGraphicsLayer = new GraphicsLayer();
-                this.map.addLayer(this.ergGraphicsLayer);
                 
                 this.drawToolbar = new Draw(this.map);
                 this.own(on(this.drawToolbar, "draw-end", lang.hitch(this, this.addGraphic)));
