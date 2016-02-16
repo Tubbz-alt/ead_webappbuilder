@@ -58,6 +58,10 @@ define([
       //   console.log(type + "-------------------------------");
       // });
       var nodeAndSubNode;
+
+      // if(layerInfo.layerObject.url.search('token')>-1){
+      //   layerInfo.layerObject.url =layerInfo.layerObject.url.split('?token')[0];
+      // }
       if (layerInfo.newSubLayers.length === 0) {
         //addLayerNode
         nodeAndSubNode = this.addLayerNode(layerInfo, level, toTableNode);

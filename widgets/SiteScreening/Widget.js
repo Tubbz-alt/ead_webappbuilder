@@ -165,7 +165,7 @@ define([
                             document.getElementById('overlapspinner').setAttribute("disabled", true);
                             this.overlapspinner.value = '';
                             document.getElementById('queryFieldValue').setAttribute("disabled", true);
-                            document.getElementById('queryValue').setAttribute("disabled", true);
+                            //document.getElementById('queryValue').setAttribute("disabled", true);
                         }
 
                         this.queryType.addOption(filetype);
@@ -217,6 +217,8 @@ define([
                 this.drawToolbar.deactivate();
                 this.queryValue.attr('value', '');
                 this.scenarioName.attr('value', '');
+                this.shpType.set('value',"No Value");
+                this.shpType._updateSelection();
 
                 domStyle.set("downloadfile", {
                     "display": 'none',

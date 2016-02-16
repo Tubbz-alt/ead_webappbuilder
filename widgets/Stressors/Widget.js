@@ -142,9 +142,11 @@ define([
                 if(this.params.config.token != ''){
                     this.eadlayer.token = this.params.config.token;
                 }
+
                 this.map.addLayer(this.eadlayer);
-                //var t = WidgetManager.getInstance().getAllWidgets();
-                //WidgetManager.getInstance().loadWidget(t);
+
+                this.eadlayer.url = 'http://aeadvsa077-ead.erwda.int/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/GlobalSensitivity2/MapServer';  
+
                 var t = {
                     "uri": "widgets/LayerList/Widget",
                     "version": "1.3",
