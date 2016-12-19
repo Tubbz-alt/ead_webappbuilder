@@ -13,7 +13,7 @@
     ],
     "version": "1.3"
   },
-  "portalUrl": "https://stagingenviroportal.ead.ae/stgarcgisportal",
+  "portalUrl": "https://10.10.25.139/stgarcgisportal",
   "appId": "",
   "title": "EAD Portal Demo",
   "subtitle": "",
@@ -130,7 +130,7 @@
       }
     },
     "id": "map",
-    "portalUrl": "https://stagingenviroportal.ead.ae/stgarcgisportal"
+    "portalUrl": "https://10.10.25.139/stgarcgisportal"
   },
   "widgetPool": {
     "panel": {

@@ -197,6 +197,12 @@ define([
             
             onClearBtnClicked: function () {
                 this.spillGraphicsLayer.clear();
+                
+                //clear other layers if on the map
+                if(this.map.getLayer('incidentLayer')){
+                    this.map.getLayer('incidentLayer').clear();
+                }                
+
                 this.selectedMaterialType= null;
                 this.selectedCustomMetrics= null;
                 this.inputFileData= null;
@@ -425,6 +431,11 @@ define([
                 this.map.disableMapNavigation();
                 this.spillGraphicsLayer.clear();
                 this.drawToolbar.activate(tool);
+
+                //clear other layers if on the map
+                if(this.map.getLayer('incidentLayer')){
+                    this.map.getLayer('incidentLayer').clear();
+                }
             },
 
             addQuery:function(){
@@ -699,6 +710,7 @@ define([
 
                 //spill location graphics layer
                 this.spillGraphicsLayer = new GraphicsLayer();
+                this.spillGraphicsLayer.id = 'screeningLayer';
                 this.map.addLayer(this.spillGraphicsLayer);
 
                 this.drawToolbar = new Draw(this.map);

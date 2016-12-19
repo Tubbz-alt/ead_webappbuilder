@@ -174,6 +174,11 @@ define([
                 if(this.spillGraphicsLayer != null){
                     this.spillGraphicsLayer.clear();
                 }
+                //clear other layers if on the map
+                if(this.map.getLayer('screeningLayer')){
+                    this.map.getLayer('screeningLayer').clear();
+                } 
+
                 var newStore = new dojo.data.ItemFileReadStore({data: {  identifier: "",  items: []}});   
                 dijit.byId("grid2").setStore(newStore, {}); 
 
@@ -337,6 +342,11 @@ define([
                 this.map.disableMapNavigation();
                 this.spillGraphicsLayer.clear();
                 this.drawToolbar.activate(tool);
+
+                //clear other layers if on the map
+                if(this.map.getLayer('screeningLayer')){
+                    this.map.getLayer('screeningLayer').clear();
+                }
             },
 
             onSolve: function (evt) {
@@ -573,6 +583,7 @@ define([
 
                 //spill location graphics layer
                 this.spillGraphicsLayer = new GraphicsLayer();
+                this.spillGraphicsLayer.id = 'incidentLayer';
                 this.map.addLayer(this.spillGraphicsLayer);
                 
                 this.drawToolbar = new Draw(this.map);

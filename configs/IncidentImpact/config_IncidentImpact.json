@@ -1,9 +1,9 @@
 {
   "proxy":"",
-  "proxyprefix":"https://stagingenviroportal.ead.ae/stgarcgisserver/rest/services",
-  "token":"IAJw5Fe0hBNtm1_yC-z4q3g_EryImBaKp0xmOi4GN6prLqWvjod2wEBeh1ofg5qwAZ86f0921g4hkKjMjhpDNA..",
-  "url":"https://stagingenviroportal.ead.ae/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3?token=IAJw5Fe0hBNtm1_yC-z4q3g_EryImBaKp0xmOi4GN6prLqWvjod2wEBeh1ofg5qwAZ86f0921g4hkKjMjhpDNA..",
-  "url_upload":"https://stagingenviroportal.ead.ae/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/uploads/upload?token=IAJw5Fe0hBNtm1_yC-z4q3g_EryImBaKp0xmOi4GN6prLqWvjod2wEBeh1ofg5qwAZ86f0921g4hkKjMjhpDNA..",
+  "proxyprefix":"https://10.10.25.139/stgarcgisserver/rest/services",
+  "token":"2PE96AGKbbnH4kUcIIISBQSVpmNEvPgIQa2SG9Q_30cQU3d9XlTQjXwAWsBcMC6B3WmMPoFUurVIwpaVjyY8hC9vg7eN1r7Un1j8c4EwXTM.",
+  "url":"https://10.10.25.139/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/Incident%20Impacts%20v3?token=2PE96AGKbbnH4kUcIIISBQSVpmNEvPgIQa2SG9Q_30cQU3d9XlTQjXwAWsBcMC6B3WmMPoFUurVIwpaVjyY8hC9vg7eN1r7Un1j8c4EwXTM.",
+  "url_upload":"https://10.10.25.139/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/IncidentImpacts3/GPServer/uploads/upload?token=2PE96AGKbbnH4kUcIIISBQSVpmNEvPgIQa2SG9Q_30cQU3d9XlTQjXwAWsBcMC6B3WmMPoFUurVIwpaVjyY8hC9vg7eN1r7Un1j8c4EwXTM.",
   "habitats": [
       "Mudflats",
       "Tidal flats",

@@ -145,7 +145,7 @@ define([
 
                 this.map.addLayer(this.eadlayer);
 
-                this.eadlayer.url = 'https://stagingenviroportal.ead.ae/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/GlobalSensitivity2/MapServer';  
+                this.eadlayer.url = 'https://10.10.25.139/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/GlobalSensitivity2/MapServer';  
 
                 var t = {
                     "uri": "widgets/LayerList/Widget",

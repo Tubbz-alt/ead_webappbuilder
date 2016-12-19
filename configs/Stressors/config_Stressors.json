@@ -1,4 +1,4 @@
 {
-  "token":"ogkOQnzLJLXoJ91O5QoFUBS-WTy7_bR2-qEulYDSpyj7HdGeP5H8UdVE8c9NSSF9ovGWwjqwtJ1w__OdAsrx95mQXHbjgXRUAbn73FUNN64.",
-  "StressorURL": "https://stagingenviroportal.ead.ae/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/GlobalSensitivity2/MapServer?token=ogkOQnzLJLXoJ91O5QoFUBS-WTy7_bR2-qEulYDSpyj7HdGeP5H8UdVE8c9NSSF9ovGWwjqwtJ1w__OdAsrx95mQXHbjgXRUAbn73FUNN64."
+  "token":"2PE96AGKbbnH4kUcIIISBQSVpmNEvPgIQa2SG9Q_30cQU3d9XlTQjXwAWsBcMC6B3WmMPoFUurVIwpaVjyY8hC9vg7eN1r7Un1j8c4EwXTM.",
+  "StressorURL": "https://10.10.25.139/stgarcgisserver/rest/services/EAD_CoastalAtlas_Drafts/GlobalSensitivity2/MapServer?token=2PE96AGKbbnH4kUcIIISBQSVpmNEvPgIQa2SG9Q_30cQU3d9XlTQjXwAWsBcMC6B3WmMPoFUurVIwpaVjyY8hC9vg7eN1r7Un1j8c4EwXTM."
 }
